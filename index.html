@@ -595,6 +595,17 @@ function copyScreenshot() {
     });
 }
 </script>
-
+<style>
+  [data-netlify-deploy-id], 
+  .netlify-badge, 
+  #netlify-badge, 
+  netlify-plugin-drawer,
+  iframe[src*="netlify"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+</style>
 </body>
 </html>
