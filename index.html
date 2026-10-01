@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vicidial Performance Report Analyzer</title>
+  <title>Vicidial CSV & Performance Reporter</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
     h1 { text-align: center; color: #38bdf8; margin-bottom: 20px; }
     .card { background-color: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); }
-    .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-    input, textarea, button { padding: 10px; border-radius: 5px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-family: inherit; }
-    textarea { height: 120px; resize: vertical; }
+    .form-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; }
+    .row-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    input[type="text"], textarea, button { padding: 10px; border-radius: 5px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-family: inherit; }
+    input[type="file"] { background-color: #0f172a; border: 1px dashed #38bdf8; padding: 10px; border-radius: 5px; color: #94a3b8; cursor: pointer; width: 100%; box-sizing: border-box; }
+    textarea { height: 90px; resize: vertical; }
     .btn-container { display: flex; gap: 10px; }
-    button { background-color: #0284c7; cursor: pointer; font-weight: bold; border: none; flex: 1; }
+    button { background-color: #0284c7; cursor: pointer; font-weight: bold; border: none; flex: 1; padding: 12px; }
     button:hover { background-color: #0369a1; }
     .btn-clear { background-color: #64748b; }
     .btn-clear:hover { background-color: #475569; }
@@ -23,20 +25,33 @@
     th { background-color: #334155; color: #38bdf8; }
     tr:nth-child(even) { background-color: #1a2234; }
     .hot { color: #4ade80; font-weight: bold; }
+    .file-box { background: #1a2234; padding: 15px; border-radius: 8px; border: 1px solid #334155; }
+    .divider { text-align: center; color: #64748b; font-size: 12px; margin: 5px 0; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <h1>🚀 Vicidial Multi-Performance Analyzer</h1>
+  <h1>🚀 Vicidial Agent Performance Reporter</h1>
 
   <!-- Input Form -->
   <div class="card">
-    <h3>📋 Paste Vicidial Performance Report</h3>
+    <h3>📂 Upload Vicidial Agent Performance CSV / Report</h3>
     <div class="form-group">
       <input type="text" id="dialerName" placeholder="Dialer Name (e.g. ACA 3, Outbound 1)" required>
-      <textarea id="reportData" placeholder="Vicidial Performance Report ka text / CSV data yahan paste karein..."></textarea>
+      
+      <!-- Option A: File Upload -->
+      <div class="file-box">
+        <label style="font-size: 13px; color: #38bdf8; font-weight: bold; display: block; margin-bottom: 5px;">📁 Choose CSV File downloaded from Vicidial:</label>
+        <input type="file" id="csvFileInput" accept=".csv, .txt">
+      </div>
+
+      <div class="divider">── OR PASTE DIRECT REPORT TEXT ──</div>
+
+      <!-- Option B: Direct Text Paste -->
+      <textarea id="reportData" placeholder="Ya Vicidial Report ka CSV text yahan paste karein..."></textarea>
+
       <div class="btn-container">
-        <button onclick="processReport()">📊 Generate / Update Report</button>
+        <button onclick="processReport()">📊 Process & Generate Dashboard</button>
         <button class="btn-clear" onclick="clearAllData()">🗑️ Clear All Saved Data</button>
       </div>
     </div>
@@ -44,7 +59,7 @@
 
   <!-- Multi-Dialer Summary Table -->
   <div class="card">
-    <h3>📊 Performance Overview</h3>
+    <h3>📊 Overall Performance Summary</h3>
     <table>
       <thead>
         <tr>
@@ -57,12 +72,12 @@
           <th>SALE</th>
           <th>Total Deals</th>
           <th>Conversion %</th>
-          <th>Status</th>
+          <th>Status / Time</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody id="summaryTable">
-        <tr><td colspan="11">No reports added yet. Paste a report above to view analytics.</td></tr>
+        <tr><td colspan="11">No reports uploaded yet. Upload a CSV file or paste data above.</td></tr>
       </tbody>
     </table>
   </div>
@@ -75,63 +90,68 @@
       renderTable();
     }
 
-    function processReport() {
+    async function processReport() {
       const name = document.getElementById('dialerName').value.trim();
-      const rawText = document.getElementById('reportData').value.trim();
+      const fileInput = document.getElementById('csvFileInput');
+      const textData = document.getElementById('reportData').value.trim();
 
-      if (!name || !rawText) {
-        alert("Please enter Dialer Name and Paste Report Data!");
+      if (!name) {
+        alert("Kripya Dialer Name enter karein!");
         return;
       }
 
-      // Default Metrics
+      let rawContent = "";
+
+      // 1. If File selected, read file
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        rawContent = await file.text();
+      } else if (textData) {
+        rawContent = textData;
+      } else {
+        alert("Kripya CSV File select karein YA report text paste karein!");
+        return;
+      }
+
+      parseAndSaveData(name, rawContent);
+    }
+
+    function parseAndSaveData(name, rawText) {
       let calls = 0, d1 = 0, d5 = 0, d8 = 0, d9 = 0, sale = 0, totalDeals = 0;
 
-      // Extract numbers via Regex from pasted Vicidial text/CSV
       const lines = rawText.split('\n');
 
       lines.forEach(line => {
         const uppercaseLine = line.toUpperCase();
 
-        // Target Specific Dispositions if formatted
+        // Check disposition occurrences or column values
         if (uppercaseLine.includes('D1')) d1 += countMatches(line, 'D1');
         if (uppercaseLine.includes('D5')) d5 += countMatches(line, 'D5');
         if (uppercaseLine.includes('D8')) d8 += countMatches(line, 'D8');
         if (uppercaseLine.includes('D9')) d9 += countMatches(line, 'D9');
         if (uppercaseLine.includes('SALE')) sale += countMatches(line, 'SALE');
-
-        // General Call Count Parser (extract highest or sum of numeric tokens)
-        const numbers = line.match(/\b\d+\b/g);
-        if (numbers) {
-          numbers.forEach(num => {
-            const val = parseInt(num);
-            if (val > 0 && val < 50000) {
-              // heuristically calculate call volume
-            }
-          });
-        }
       });
 
-      // Total Deals Calculation
-      totalDeals = d1 + d5 + d8 + d9 + sale;
-
-      // Fallback: If CSV structured line parsing
+      // CSV structured line parsing (Vicidial Export Format)
       if (lines.length > 1 && lines[0].includes(',')) {
         calls = 0; totalDeals = 0;
         lines.forEach((l, idx) => {
-          if (idx > 0) {
+          if (idx > 0 && l.trim() !== "") {
             const cols = l.split(',');
             if (cols.length >= 3) {
-              calls += parseInt(cols[2]) || 0;
-              totalDeals += parseInt(cols[cols.length - 1]) || 0;
+              const c = parseInt(cols[2].replace(/"/g, '')) || 0;
+              const d = parseInt(cols[cols.length - 1].replace(/"/g, '')) || 0;
+              calls += c;
+              totalDeals += d;
             }
           }
         });
-      } else if (totalDeals > 0) {
-        calls = Math.max(totalDeals * 5, 100); // Estimated base call range if raw text
       }
 
-      // Check if dialer already exists in array
+      const extractedDeals = d1 + d5 + d8 + d9 + sale;
+      if (extractedDeals > totalDeals) totalDeals = extractedDeals;
+      if (calls === 0 && totalDeals > 0) calls = totalDeals * 4;
+
       const existingIdx = dialerReports.findIndex(d => d.name.toLowerCase() === name.toLowerCase());
 
       const item = {
@@ -150,8 +170,11 @@
       }
 
       saveReports();
+
+      // Reset inputs
+      document.getElementById('csvFileInput').value = '';
       document.getElementById('reportData').value = '';
-      alert(`Report for "${name}" successfully updated!`);
+      alert(`Report for "${name}" successfully processed and updated!`);
     }
 
     function countMatches(str, keyword) {
@@ -179,7 +202,7 @@
       const tbody = document.getElementById('summaryTable');
 
       if (dialerReports.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11">No reports added yet. Paste a report above to view analytics.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11">No reports uploaded yet. Upload a CSV file or paste data above.</td></tr>';
         return;
       }
 
