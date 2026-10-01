@@ -3,109 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Performance Reporter - Vicidialer Transformation</title>
+  <title>Performance Reporter</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
-    .editable-cell {
+    body {
+      background-color: #ffffff;
+      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .btn-pill {
+      border: 2px solid #000000;
+      background-color: #ffffff;
+      color: #000000;
+      font-weight: 700;
+      border-radius: 9999px;
+      padding: 6px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+    .btn-pill.active {
+      background-color: #000000;
+      color: #ffffff;
+    }
+    .table-cell-editable {
       outline: none;
       padding: 2px 4px;
-      border-radius: 4px;
-      transition: background-color 0.2s;
+      border-radius: 3px;
     }
-    .editable-cell:focus {
-      background-color: rgba(255, 255, 255, 0.25);
-      box-shadow: 0 0 0 2px #fff;
+    .table-cell-editable:focus {
+      background-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 0 2px #ffffff;
     }
+    .green-theme { background-color: #16a34a; }
+    .blue-theme { background-color: #2563eb; }
+    .red-theme { background-color: #dc2626; }
+    .gold-theme { background-color: #d97706; }
+    .purple-theme { background-color: #9333ea; }
   </style>
 </head>
-<body class="bg-black text-white min-h-screen font-sans p-4 sm:p-6 max-w-4xl mx-auto">
+<body class="p-4 max-w-md mx-auto">
 
-  <!-- Header Section -->
-  <header class="mb-4">
-    <h1 class="text-3xl font-extrabold text-black tracking-tight bg-white px-2 py-1 inline-block rounded">Performance Reporter</h1>
-    <p class="text-gray-400 text-sm mt-1 font-semibold">Automated Vicidialer Transformation</p>
-  </header>
+  <!-- Title Section -->
+  <div class="mb-4">
+    <h1 class="text-3xl font-black tracking-tight text-black">Performance Reporter</h1>
+    <p class="text-gray-700 text-sm font-semibold mt-0.5">Automated Vicidialer Transformation</p>
+  </div>
 
-  <!-- Control Controls Top Bar -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-    <input type="text" id="supervisorName" value="Qaiser Khan" class="bg-white text-black font-bold px-3 py-2 rounded-lg border-2 border-black focus:outline-none text-base">
+  <!-- Top Inputs Bar -->
+  <div class="grid grid-cols-2 gap-3 mb-3">
+    <input type="text" id="supervisorInput" value="Qaiser Khan" oninput="updateSupervisorName(this.value)" class="border-2 border-black rounded-lg px-3 py-2 text-base font-bold bg-white outline-none">
     
-    <div class="flex gap-2">
-      <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-white text-black font-bold px-3 py-2 rounded-lg border-2 border-black flex-1 text-base">
-        <option value="classic-green">🟢 Classic Green</option>
-        <option value="ocean-blue">🔵 Ocean Blue</option>
-        <option value="crimson-red">🔴 Crimson Red</option>
-        <option value="amber-gold">🟡 Amber Gold</option>
-        <option value="purple-dark">🟣 Dark Purple</option>
+    <div class="relative">
+      <select id="themeSelector" onchange="changeColorTheme(this.value)" class="w-full border-2 border-black rounded-lg px-3 py-2 text-base font-bold bg-white appearance-none pr-8 cursor-pointer">
+        <option value="#16a34a">🟢 Classic Green</option>
+        <option value="#2563eb">🔵 Ocean Blue</option>
+        <option value="#dc2626">🔴 Crimson Red</option>
+        <option value="#d97706">🟡 Amber Gold</option>
+        <option value="#9333ea">🟣 Royal Purple</option>
         <option value="custom">🎨 Custom Color</option>
       </select>
-      <input type="color" id="customColorPicker" value="#16a34a" onchange="applyCustomColor(this.value)" class="h-10 w-12 rounded cursor-pointer hidden border-2 border-white">
+      <input type="color" id="customPicker" value="#16a34a" onchange="applyCustomColor(this.value)" class="hidden absolute right-1 top-1.5 w-7 h-7 border border-black rounded cursor-pointer">
     </div>
   </div>
 
-  <div class="flex gap-3 mb-6">
-    <button onclick="resetData()" class="bg-black text-white font-bold border-2 border-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">Reset</button>
-    <button onclick="copyScreenshot()" class="bg-black text-white font-bold border-2 border-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">Copy Screenshot</button>
+  <!-- Top Action Buttons -->
+  <div class="flex gap-3 mb-5">
+    <button onclick="resetData()" class="bg-black text-white font-black px-6 py-2 rounded-lg text-sm border-2 border-black">Reset</button>
+    <button onclick="copyScreenshot()" class="bg-black text-white font-black px-6 py-2 rounded-lg text-sm border-2 border-black">Copy Screenshot</button>
   </div>
 
-  <!-- Upload Area -->
-  <div id="dropZone" onclick="document.getElementById('csvInput').click()" class="border-2 border-dashed border-gray-400 rounded-xl p-6 text-center cursor-pointer hover:bg-gray-900 transition mb-6 bg-black">
-    <p class="text-sm font-bold text-gray-200 flex items-center justify-center gap-2">
+  <!-- Drag & Drop Upload Container -->
+  <div onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-black rounded-xl p-5 text-center cursor-pointer mb-5 bg-gray-50 hover:bg-gray-100 transition">
+    <p class="text-sm font-bold text-black flex items-center justify-center gap-2">
       📄 Upload / Drag & Drop Vicidialer CSV File
     </p>
-    <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+    <input type="file" id="fileInput" accept=".csv" class="hidden" onchange="processCSVUpload(event)">
   </div>
 
-  <!-- Team Filter Buttons -->
-  <div class="bg-gray-200 p-3 rounded-2xl border-2 border-black mb-6">
-    <div class="flex flex-wrap gap-2" id="teamFilterContainer">
-      <button onclick="filterTeam('ALL')" class="team-btn bg-black text-white font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">All Teams</button>
-      <button onclick="filterTeam('OTHER')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">OTHER</button>
-      <button onclick="filterTeam('2.0')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">2.0</button>
-      <button onclick="filterTeam('HQ')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">HQ</button>
-      <button onclick="filterTeam('2.1')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">2.1</button>
-      <button onclick="filterTeam('3.0')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">3.0</button>
-      <button onclick="filterTeam('3.1')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">3.1</button>
-      <button onclick="filterTeam('Team A')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">Team A</button>
-      <button onclick="filterTeam('HQ new')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">HQ new</button>
-      <button onclick="filterTeam('2.0NB')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">2.0NB</button>
+  <!-- Team Filters Box -->
+  <div class="border-2 border-black rounded-2xl p-3 bg-gray-100 mb-5">
+    <div class="flex flex-wrap gap-2" id="teamsContainer">
+      <button class="btn-pill active" onclick="filterByTeam('ALL', this)">All Teams</button>
+      <button class="btn-pill" onclick="filterByTeam('OTHER', this)">OTHER</button>
+      <button class="btn-pill" onclick="filterByTeam('2.0', this)">2.0</button>
+      <button class="btn-pill" onclick="filterByTeam('HQ', this)">HQ</button>
+      <button class="btn-pill" onclick="filterByTeam('2.1', this)">2.1</button>
+      <button class="btn-pill" onclick="filterByTeam('Team A', this)">Team A</button>
+      <button class="btn-pill" onclick="filterByTeam('HQ new', this)">HQ new</button>
+      <button class="btn-pill" onclick="filterByTeam('2.0NB', this)">2.0NB</button>
+      <button class="btn-pill" onclick="filterByTeam('3.0', this)">3.0</button>
+      <button class="btn-pill" onclick="filterByTeam('3.1', this)">3.1</button>
     </div>
   </div>
 
-  <!-- Main Report Capture Container -->
-  <div id="reportContainer" class="bg-black border-2 border-gray-800 rounded-xl overflow-hidden p-2">
+  <!-- Report Capture Section -->
+  <div id="captureArea" class="bg-black rounded-2xl p-2 border-2 border-black text-white">
     
-    <!-- File Header Info -->
-    <div class="flex items-center justify-between p-3 bg-gray-900 rounded-lg mb-2 text-xs font-mono">
-      <span id="fileNameDisplay" class="text-gray-300 font-bold truncate">AGENT_PERFORMANCE_DETAIL.csv</span>
-      <span id="agentCountBadge" class="bg-emerald-600 text-black font-bold px-3 py-1 rounded-full uppercase">15 AGENTS DETECTED</span>
+    <!-- File Info Badge -->
+    <div class="flex items-center justify-between mb-2 px-1">
+      <div id="csvFilename" class="text-xs font-mono font-bold text-white truncate max-w-[220px]">AGENT_PERFORMACE_DETAIL20261001-104413.csv</div>
+      <div id="agentBadge" class="bg-emerald-500 text-black font-black text-xs px-3 py-1 rounded-full uppercase">114 AGENTS DETECTED</div>
     </div>
 
-    <!-- Supervisor Banner -->
-    <div id="themeBanner" class="bg-emerald-600 text-white font-extrabold text-2xl text-center py-2 rounded-lg mb-3 shadow">
-      <span id="bannerSupervisorName">Qaiser Khan</span>
+    <!-- Supervisor Header -->
+    <div id="supervisorBanner" class="bg-emerald-600 text-white font-black text-2xl text-center py-2 rounded-xl mb-2 tracking-wide">
+      Qaiser Khan
     </div>
 
-    <!-- Performance Table -->
+    <!-- Data Table -->
     <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse font-bold text-xs sm:text-sm">
+      <table class="w-full text-white font-extrabold text-xs text-center border-separate border-spacing-y-1">
         <thead>
-          <tr class="bg-black text-gray-200 border-b-2 border-gray-700">
-            <th class="p-2.5">USER</th>
-            <th class="p-2.5 text-center">ID</th>
-            <th class="p-2.5 text-center">D1</th>
-            <th class="p-2.5 text-center">D5</th>
-            <th class="p-2.5 text-center">D8</th>
-            <th class="p-2.5 text-center">TOTAL CALLS</th>
-            <th class="p-2.5 text-center">TOTAL SALES</th>
-            <th class="p-2.5 text-center">CONV (%)</th>
-            <th class="p-2.5 text-center">LAST HOUR</th>
+          <tr class="text-gray-300 border-b border-gray-700">
+            <th class="py-2 text-left px-2">USER</th>
+            <th class="py-2">ID</th>
+            <th class="py-2">D1</th>
+            <th class="py-2">D5</th>
+            <th class="py-2">D8</th>
+            <th class="py-2">TOTAL</th>
+            <th class="py-2">SALES</th>
+            <th class="py-2">CONV</th>
+            <th class="py-2">LAST HR</th>
           </tr>
         </thead>
-        <tbody id="agentTableBody">
-          <!-- Rows inserted dynamically -->
+        <tbody id="tableBody">
+          <!-- Table Rows populated dynamically -->
         </tbody>
       </table>
     </div>
@@ -113,160 +137,136 @@
   </div>
 
   <script>
-    // Sample Data Initialization
-    let agentsData = [
-      { user: "Michael Tolliver-HQ", id: "1001", team: "HQ", d1: 69, d5: 38, d8: 77, totalCalls: 450, totalSales: 184, conversion: "40.8%", lastHour: 18 },
-      { user: "Danny Parker 2.0", id: "2018", team: "2.0", d1: 79, d5: 23, d8: 75, totalCalls: 420, totalSales: 177, conversion: "42.1%", lastHour: 15 },
-      { user: "Dan Muccray-HQ", id: "1016", team: "HQ", d1: 59, d5: 46, d8: 64, totalCalls: 390, totalSales: 169, conversion: "43.3%", lastHour: 14 },
-      { user: "Jordan Ford-HQ", id: "1002", team: "HQ", d1: 58, d5: 22, d8: 65, totalCalls: 340, totalSales: 145, conversion: "42.6%", lastHour: 12 },
-      { user: "Bryan Grayson 2.0", id: "2004", team: "2.0", d1: 53, d5: 14, d8: 58, totalCalls: 310, totalSales: 125, conversion: "40.3%", lastHour: 10 },
-      { user: "Mike James-HQ", id: "1003", team: "HQ", d1: 32, d5: 14, d8: 71, totalCalls: 290, totalSales: 117, conversion: "40.3%", lastHour: 9 },
-      { user: "Steve Henley-HQ", id: "1024", team: "HQ", d1: 17, d5: 41, d8: 56, totalCalls: 280, totalSales: 114, conversion: "40.7%", lastHour: 8 },
-      { user: "David Gibson 2.0", id: "2014", team: "2.0", d1: 58, d5: 14, d8: 38, totalCalls: 270, totalSales: 110, conversion: "40.7%", lastHour: 7 },
-      { user: "Lewis Cooper 2.0", id: "2010", team: "2.0", d1: 39, d5: 8, d8: 59, totalCalls: 260, totalSales: 106, conversion: "40.7%", lastHour: 6 },
-      { user: "Bryan Wilson 2.0", id: "2032", team: "2.0", d1: 35, d5: 20, d8: 50, totalCalls: 250, totalSales: 105, conversion: "42.0%", lastHour: 5 },
-      { user: "Oscar Lawson 2.0", id: "2005", team: "2.0", d1: 34, d5: 12, d8: 58, totalCalls: 240, totalSales: 104, conversion: "43.3%", lastHour: 5 },
-      { user: "Logan Foster 2.0", id: "2034", team: "2.0", d1: 38, d5: 14, d8: 50, totalCalls: 230, totalSales: 102, conversion: "44.3%", lastHour: 4 },
-      { user: "Jason Morgan-HQ", id: "1010", team: "HQ", d1: 37, d5: 32, d8: 32, totalCalls: 220, totalSales: 101, conversion: "45.9%", lastHour: 4 },
-      { user: "Jason Brown-HQ", id: "1004", team: "HQ", d1: 23, d5: 18, d8: 55, totalCalls: 210, totalSales: 96, conversion: "45.7%", lastHour: 3 },
-      { user: "Nick Clover 2.0", id: "1030", team: "2.0", d1: 45, d5: 10, d8: 40, totalCalls: 200, totalSales: 95, conversion: "47.5%", lastHour: 2 }
+    let defaultAgents = [
+      { name: "Michael Tolliver-HQ", id: "1001", d1: 69, d5: 38, d8: 77, total: 184, sales: 82, conv: "44.5%", lastHr: 12, team: "HQ" },
+      { name: "Danny Parker 2.0", id: "2018", d1: 79, d5: 23, d8: 75, total: 177, sales: 79, conv: "44.6%", lastHr: 10, team: "2.0" },
+      { name: "Dan Muccray-HQ", id: "1016", d1: 59, d5: 46, d8: 64, total: 169, sales: 71, conv: "42.0%", lastHr: 11, team: "HQ" },
+      { name: "Jordan Ford-HQ", id: "1002", d1: 58, d5: 22, d8: 65, total: 145, sales: 64, conv: "44.1%", lastHr: 9, team: "HQ" },
+      { name: "Bryan Grayson 2.0", id: "2004", d1: 53, d5: 14, d8: 58, total: 125, sales: 55, conv: "44.0%", lastHr: 8, team: "2.0" },
+      { name: "Mike James-HQ", id: "1003", d1: 32, d5: 14, d8: 71, total: 117, sales: 50, conv: "42.7%", lastHr: 7, team: "HQ" },
+      { name: "Steve Henley-HQ", id: "1024", d1: 17, d5: 41, d8: 56, total: 114, sales: 48, conv: "42.1%", lastHr: 6, team: "HQ" },
+      { name: "David Gibson 2.0", id: "2014", d1: 58, d5: 14, d8: 38, total: 110, sales: 45, conv: "40.9%", lastHr: 5, team: "2.0" },
+      { name: "Lewis Cooper 2.0", id: "2010", d1: 39, d5: 8, d8: 59, total: 106, sales: 42, conv: "39.6%", lastHr: 5, team: "2.0" },
+      { name: "Bryan Wilson 2.0", id: "2032", d1: 35, d5: 20, d8: 50, total: 105, sales: 41, conv: "39.0%", lastHr: 4, team: "2.0" },
+      { name: "Oscar Lawson 2.0", id: "2005", d1: 34, d5: 12, d8: 58, total: 104, sales: 40, conv: "38.4%", lastHr: 4, team: "2.0" },
+      { name: "Logan Foster 2.0", id: "2034", d1: 38, d5: 14, d8: 50, total: 102, sales: 39, conv: "38.2%", lastHr: 3, team: "2.0" },
+      { name: "Jason Morgan - Danish-HQ", id: "1010", d1: 37, d5: 32, d8: 32, total: 101, sales: 38, conv: "37.6%", lastHr: 3, team: "HQ" },
+      { name: "Jason Brown-HQ", id: "1004", d1: 23, d5: 18, d8: 55, total: 96, sales: 35, conv: "36.4%", lastHr: 2, team: "HQ" },
+      { name: "Nick Clover 2.0", id: "1030", d1: 45, d5: 10, d8: 40, total: 95, sales: 34, conv: "35.7%", lastHr: 2, team: "2.0" }
     ];
 
-    let currentThemeColor = "#16a34a"; // Classic Green Default
-    let selectedTeam = "ALL";
+    let currentTheme = "#16a34a";
+    let activeFilter = "ALL";
 
-    // Dynamic Supervisor Name Update
-    document.getElementById('supervisorName').addEventListener('input', function(e) {
-      document.getElementById('bannerSupervisorName').innerText = e.target.value || "Supervisor";
-    });
+    function updateSupervisorName(val) {
+      document.getElementById('supervisorBanner').innerText = val || "Supervisor";
+    }
 
-    // Render Table according to Top, Mid, Low performers tiering
     function renderTable() {
-      const tbody = document.getElementById('agentTableBody');
+      const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
 
-      let filtered = agentsData;
-      if (selectedTeam !== "ALL") {
-        filtered = agentsData.filter(a => a.team.toUpperCase().includes(selectedTeam.toUpperCase()) || a.user.toUpperCase().includes(selectedTeam.toUpperCase()));
+      let list = defaultAgents;
+      if (activeFilter !== "ALL") {
+        list = defaultAgents.filter(a => a.team.toUpperCase().includes(activeFilter) || a.name.toUpperCase().includes(activeFilter));
       }
 
-      // Sort by Sales High to Low
-      filtered.sort((a, b) => (b.totalSales || 0) - (a.totalSales || 0));
+      // Sort High to Low by Total Calls
+      list.sort((a,b) => b.total - a.total);
 
-      document.getElementById('agentCountBadge').innerText = `${filtered.length} AGENTS DETECTED`;
+      document.getElementById('agentBadge').innerText = `${list.length} AGENTS DETECTED`;
 
-      const totalCount = filtered.length;
-
-      filtered.forEach((agent, index) => {
+      list.forEach((item, i) => {
         const tr = document.createElement('tr');
+        tr.style.backgroundColor = currentTheme;
         
-        // Tiering logic: Top 30% Top, Mid 40% Mid, Bottom 30% Low
-        let rowBg = currentThemeColor; 
-        let opacity = 1;
-
-        if (index < Math.ceil(totalCount * 0.3)) {
-          // Top performers (Full Brightness)
-          opacity = 1;
-        } else if (index < Math.ceil(totalCount * 0.7)) {
-          // Mid performers (Medium opacity)
-          opacity = 0.8;
+        // Gradient / Opacity hierarchy: High (Top), Mid (Center), Low (Bottom)
+        if (i < Math.ceil(list.length * 0.33)) {
+          tr.style.opacity = "1";
+        } else if (i < Math.ceil(list.length * 0.66)) {
+          tr.style.opacity = "0.85";
         } else {
-          // Low performers (Lower opacity/darker background)
-          opacity = 0.6;
+          tr.style.opacity = "0.7";
         }
 
-        tr.style.backgroundColor = rowBg;
-        tr.style.opacity = opacity;
-        tr.className = "border-b border-black text-white hover:brightness-110 transition";
+        tr.className = "rounded text-white hover:brightness-110 transition";
 
         tr.innerHTML = `
-          <td class="p-2.5 font-bold"><span class="editable-cell" contenteditable="true">${agent.user}</span></td>
-          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.id}</span></td>
-          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.d1}</span></td>
-          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.d5}</span></td>
-          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.d8}</span></td>
-          <td class="p-2.5 text-center font-bold"><span class="editable-cell" contenteditable="true">${agent.totalCalls}</span></td>
-          <td class="p-2.5 text-center font-bold"><span class="editable-cell" contenteditable="true">${agent.totalSales}</span></td>
-          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.conversion}</span></td>
-          <td class="p-2.5 text-center font-bold"><span class="editable-cell" contenteditable="true">${agent.lastHour}</span></td>
+          <td class="py-2.5 text-left px-2 leading-tight font-extrabold"><span class="table-cell-editable" contenteditable="true">${item.name}</span></td>
+          <td class="py-2.5"><span class="table-cell-editable" contenteditable="true">${item.id}</span></td>
+          <td class="py-2.5"><span class="table-cell-editable" contenteditable="true">${item.d1}</span></td>
+          <td class="py-2.5"><span class="table-cell-editable" contenteditable="true">${item.d5}</span></td>
+          <td class="py-2.5"><span class="table-cell-editable" contenteditable="true">${item.d8}</span></td>
+          <td class="py-2.5 font-black"><span class="table-cell-editable" contenteditable="true">${item.total}</span></td>
+          <td class="py-2.5 font-black"><span class="table-cell-editable" contenteditable="true">${item.sales}</span></td>
+          <td class="py-2.5"><span class="table-cell-editable" contenteditable="true">${item.conv}</span></td>
+          <td class="py-2.5 font-black"><span class="table-cell-editable" contenteditable="true">${item.lastHr}</span></td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // Filter Team Function
-    function filterTeam(teamName) {
-      selectedTeam = teamName;
-      document.querySelectorAll('.team-btn').forEach(btn => {
-        if (btn.innerText.toUpperCase() === teamName.toUpperCase() || (teamName === 'ALL' && btn.innerText === 'All Teams')) {
-          btn.className = "team-btn bg-black text-white font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm";
-        } else {
-          btn.className = "team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm";
-        }
-      });
+    function filterByTeam(team, btn) {
+      activeFilter = team;
+      document.querySelectorAll('.btn-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       renderTable();
     }
 
-    // Theme Color Changes
-    function changeTheme(theme) {
-      const picker = document.getElementById('customColorPicker');
-      picker.classList.add('hidden');
-
-      switch(theme) {
-        case 'classic-green': currentThemeColor = "#16a34a"; break;
-        case 'ocean-blue': currentThemeColor = "#2563eb"; break;
-        case 'crimson-red': currentThemeColor = "#dc2626"; break;
-        case 'amber-gold': currentThemeColor = "#d97706"; break;
-        case 'purple-dark': currentThemeColor = "#7c3aed"; break;
-        case 'custom': 
-          picker.classList.remove('hidden');
-          currentThemeColor = picker.value;
-          break;
+    function changeColorTheme(color) {
+      const picker = document.getElementById('customPicker');
+      if (color === 'custom') {
+        picker.classList.remove('hidden');
+        currentTheme = picker.value;
+      } else {
+        picker.classList.add('hidden');
+        currentTheme = color;
       }
-      document.getElementById('themeBanner').style.backgroundColor = currentThemeColor;
+      document.getElementById('supervisorBanner').style.backgroundColor = currentTheme;
+      document.getElementById('agentBadge').style.backgroundColor = currentTheme;
       renderTable();
     }
 
     function applyCustomColor(color) {
-      currentThemeColor = color;
-      document.getElementById('themeBanner').style.backgroundColor = currentThemeColor;
+      currentTheme = color;
+      document.getElementById('supervisorBanner').style.backgroundColor = currentTheme;
+      document.getElementById('agentBadge').style.backgroundColor = currentTheme;
       renderTable();
     }
 
-    // CSV File Reader
-    function handleFileUpload(e) {
-      const file = e.target.files[0];
+    function processCSVUpload(evt) {
+      const file = evt.target.files[0];
       if (!file) return;
 
-      document.getElementById('fileNameDisplay').innerText = file.name;
+      document.getElementById('csvFilename').innerText = file.name;
       const reader = new FileReader();
 
-      reader.onload = function(evt) {
-        const text = evt.target.result;
-        const lines = text.split('\n');
-        let parsedData = [];
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const rows = text.split('\n');
+        let parsed = [];
 
-        lines.forEach((line, idx) => {
-          if (idx === 0 || !line.trim()) return; // Skip header
-          const cols = line.split(',').map(c => c.trim().replace(/"/g, ''));
-          if (cols.length >= 3) {
-            parsedData.push({
-              user: cols[0] || 'Agent',
-              id: cols[1] || '1000',
-              team: cols[0].includes('HQ') ? 'HQ' : '2.0',
+        rows.forEach((r, idx) => {
+          if (idx === 0 || !r.trim()) return;
+          const cols = r.split(',').map(c => c.trim().replace(/"/g, ''));
+          if (cols.length >= 2) {
+            parsed.push({
+              name: cols[0] || "Agent",
+              id: cols[1] || "1000",
               d1: parseInt(cols[2]) || 0,
               d5: parseInt(cols[3]) || 0,
               d8: parseInt(cols[4]) || 0,
-              totalCalls: parseInt(cols[5]) || (parseInt(cols[2]||0)*5 + 50),
-              totalSales: parseInt(cols[6]) || (parseInt(cols[2]||0) + parseInt(cols[3]||0)),
-              conversion: cols[7] || "35.0%",
-              lastHour: parseInt(cols[8]) || Math.floor(Math.random() * 15)
+              total: parseInt(cols[5]) || 100,
+              sales: parseInt(cols[6]) || 30,
+              conv: cols[7] || "30.0%",
+              lastHr: parseInt(cols[8]) || 5,
+              team: cols[0].includes('HQ') ? 'HQ' : '2.0'
             });
           }
         });
 
-        if (parsedData.length > 0) {
-          agentsData = parsedData;
+        if (parsed.length > 0) {
+          defaultAgents = parsed;
           renderTable();
         }
       };
@@ -274,26 +274,22 @@
       reader.readAsText(file);
     }
 
-    // Screenshot Generator
     function copyScreenshot() {
-      const target = document.getElementById('reportContainer');
-      html2canvas(target).then(canvas => {
+      const el = document.getElementById('captureArea');
+      html2canvas(el).then(canvas => {
         canvas.toBlob(blob => {
-          navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob })
-          ]).then(() => {
-            alert('Screenshot copied to Clipboard successfully!');
+          navigator.clipboard.write([new ClipboardItem({'image/png': blob})]).then(() => {
+            alert('Screenshot copied to Clipboard!');
           });
         });
       });
     }
 
     function resetData() {
-      selectedTeam = "ALL";
+      activeFilter = "ALL";
       renderTable();
     }
 
-    // Initial Render
     renderTable();
   </script>
 </body>
