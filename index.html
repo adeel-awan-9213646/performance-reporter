@@ -17,7 +17,6 @@
     th { background-color: #334155; color: #38bdf8; }
     tr:nth-child(even) { background-color: #1a2234; }
     .hot { color: #4ade80; font-weight: bold; }
-    .badge-remove { display: none !important; opacity: 0 !important; }
   </style>
 </head>
 <body>
@@ -80,7 +79,6 @@
         return;
       }
 
-      // Auto correct URL if user pasted HTML page link
       if (!url.includes('non_agent_api.php')) {
         url = url.substring(0, url.lastIndexOf('/')) + '/non_agent_api.php';
       }
@@ -123,15 +121,16 @@
 
     async function fetchLiveMetrics() {
       for (let d of dialers) {
-        const apiUrl = `${d.url}?source=reporter&user=${d.user}&pass=${d.pass}&function=agent_stats_export&stage=csv`;
+        const rawApiUrl = `${d.url}?source=reporter&user=${d.user}&pass=${d.pass}&function=agent_stats_export&stage=csv`;
+        // CORS proxy bypass URL
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rawApiUrl)}`;
         
         try {
-          // Fetch API response
-          const response = await fetch(apiUrl);
-          const data = await response.text();
+          const response = await fetch(proxyUrl);
+          const result = await response.json();
+          const data = result.contents;
           
           if (data && !data.includes("ERROR")) {
-            // Process API response string
             const lines = data.trim().split("\n");
             let calls = 0, deals = 0;
 
@@ -149,7 +148,7 @@
             d.totalDeals = deals;
           }
         } catch (err) {
-          console.log("CORS / Network attempt for:", d.name);
+          console.log("Network error for:", d.name);
         }
       }
       renderSummary();
@@ -159,7 +158,6 @@
     renderSummary();
   </script>
 
-  <!-- Netlify Hide Badge Overlay -->
   <style>
     [data-netlify-deploy-id], .netlify-badge, #netlify-badge, netlify-plugin-drawer, iframe[src*="netlify"] {
       display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;
