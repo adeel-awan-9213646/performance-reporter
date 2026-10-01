@@ -3,67 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vicidial CSV & Performance Reporter</title>
+  <title>Vicidial All-Team & Agent Performance Dashboard</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
     h1 { text-align: center; color: #38bdf8; margin-bottom: 20px; }
     .card { background-color: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); }
     .form-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; }
-    .row-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    input[type="text"], textarea, button { padding: 10px; border-radius: 5px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-family: inherit; }
-    input[type="file"] { background-color: #0f172a; border: 1px dashed #38bdf8; padding: 10px; border-radius: 5px; color: #94a3b8; cursor: pointer; width: 100%; box-sizing: border-box; }
-    textarea { height: 90px; resize: vertical; }
+    input[type="text"], input[type="number"], button { padding: 10px; border-radius: 5px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-family: inherit; }
+    input[type="file"] { background-color: #0f172a; border: 1px dashed #38bdf8; padding: 15px; border-radius: 5px; color: #38bdf8; cursor: pointer; width: 100%; box-sizing: border-box; text-align: center; }
     .btn-container { display: flex; gap: 10px; }
-    button { background-color: #0284c7; cursor: pointer; font-weight: bold; border: none; flex: 1; padding: 12px; }
+    button { background-color: #0284c7; cursor: pointer; font-weight: bold; border: none; flex: 1; padding: 12px; border-radius: 5px; }
     button:hover { background-color: #0369a1; }
     .btn-clear { background-color: #64748b; }
     .btn-clear:hover { background-color: #475569; }
-    .btn-danger { background-color: #ef4444; padding: 5px 10px; font-size: 12px; flex: none; }
-    .btn-danger:hover { background-color: #dc2626; }
+    .btn-danger { background-color: #ef4444; padding: 5px 10px; font-size: 12px; border: none; cursor: pointer; border-radius: 4px; color: white; }
+    .btn-edit { background-color: #f59e0b; padding: 5px 10px; font-size: 12px; border: none; cursor: pointer; border-radius: 4px; color: white; margin-right: 5px; }
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     th, td { border: 1px solid #334155; padding: 10px; text-align: center; }
     th { background-color: #334155; color: #38bdf8; }
     tr:nth-child(even) { background-color: #1a2234; }
+    .top-performer { background-color: rgba(74, 222, 128, 0.15) !important; font-weight: bold; }
+    .low-performer { background-color: rgba(239, 68, 68, 0.15) !important; }
     .hot { color: #4ade80; font-weight: bold; }
-    .file-box { background: #1a2234; padding: 15px; border-radius: 8px; border: 1px solid #334155; }
-    .divider { text-align: center; color: #64748b; font-size: 12px; margin: 5px 0; font-weight: bold; }
+    .low { color: #f87171; font-weight: bold; }
+    .dialer-title { color: #f59e0b; border-bottom: 1px solid #334155; padding-bottom: 5px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+    .badge-top { background-color: #22c55e; color: #000; }
+    .badge-low { background-color: #ef4444; color: #fff; }
   </style>
 </head>
 <body>
 
-  <h1>🚀 Vicidial Agent Performance Reporter</h1>
+  <h1>🚀 Vicidial Performance Dashboard</h1>
 
-  <!-- Input Form -->
+  <!-- Input Form (File Upload Only) -->
   <div class="card">
-    <h3>📂 Upload Vicidial Agent Performance CSV / Report</h3>
+    <h3>📁 Upload Agent Performance CSV File</h3>
     <div class="form-group">
-      <input type="text" id="dialerName" placeholder="Dialer Name (e.g. ACA 3, Outbound 1)" required>
+      <input type="text" id="dialerName" placeholder="Dialer / Campaign Name (e.g. ACA 3, Outbound 1)" required>
+      <input type="file" id="csvFileInput" accept=".csv, .txt">
       
-      <!-- Option A: File Upload -->
-      <div class="file-box">
-        <label style="font-size: 13px; color: #38bdf8; font-weight: bold; display: block; margin-bottom: 5px;">📁 Choose CSV File downloaded from Vicidial:</label>
-        <input type="file" id="csvFileInput" accept=".csv, .txt">
-      </div>
-
-      <div class="divider">── OR PASTE DIRECT REPORT TEXT ──</div>
-
-      <!-- Option B: Direct Text Paste -->
-      <textarea id="reportData" placeholder="Ya Vicidial Report ka CSV text yahan paste karein..."></textarea>
-
       <div class="btn-container">
-        <button onclick="processReport()">📊 Process & Generate Dashboard</button>
-        <button class="btn-clear" onclick="clearAllData()">🗑️ Clear All Saved Data</button>
+        <button onclick="processReport()">📊 Upload & Generate Dashboard</button>
+        <button class="btn-clear" onclick="clearAllData()">🗑️ Clear All Reports</button>
       </div>
     </div>
   </div>
 
-  <!-- Multi-Dialer Summary Table -->
+  <!-- Overall Summary across all dialers -->
   <div class="card">
-    <h3>📊 Overall Performance Summary</h3>
+    <h3>📊 Overall Dialer Summary</h3>
     <table>
       <thead>
         <tr>
           <th>Dialer Name</th>
+          <th>Agents</th>
           <th>Total Calls</th>
           <th>D1</th>
           <th>D5</th>
@@ -71,96 +65,148 @@
           <th>D9</th>
           <th>SALE</th>
           <th>Total Deals</th>
-          <th>Conversion %</th>
-          <th>Status / Time</th>
+          <th>Conv %</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody id="summaryTable">
-        <tr><td colspan="11">No reports uploaded yet. Upload a CSV file or paste data above.</td></tr>
+        <tr><td colspan="11">No reports uploaded yet.</td></tr>
       </tbody>
     </table>
   </div>
 
+  <!-- Consolidated ALL TEAM Performance -->
+  <div class="card" style="border: 1px solid #38bdf8;">
+    <h3 style="color: #38bdf8;">🏆 ALL TEAM Consolidated Performance Ranking (Top to Low)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Agent Name</th>
+          <th>Dialer</th>
+          <th>Calls</th>
+          <th>D1</th>
+          <th>D5</th>
+          <th>D8</th>
+          <th>D9</th>
+          <th>SALE</th>
+          <th>Total Deals</th>
+          <th>Conv %</th>
+          <th>Performance Status</th>
+          <th>Edit</th>
+        </tr>
+      </thead>
+      <tbody id="allTeamTable">
+        <tr><td colspan="13">Upload CSV files to view consolidated team ranking.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Individual Dialer Breakdowns -->
+  <div class="card">
+    <h3>📞 Individual Dialer Breakdowns</h3>
+    <div id="dialerBreakdownContainer">
+      <p style="color: #94a3b8; text-align: center;">Upload CSV files to view dialer wise breakdown.</p>
+    </div>
+  </div>
+
   <script>
-    let dialerReports = JSON.parse(localStorage.getItem('vici_raw_reports')) || [];
+    let dialerReports = JSON.parse(localStorage.getItem('vici_full_dashboard_v2')) || [];
 
     function saveReports() {
-      localStorage.setItem('vici_raw_reports', JSON.stringify(dialerReports));
-      renderTable();
+      localStorage.setItem('vici_full_dashboard_v2', JSON.stringify(dialerReports));
+      renderTables();
     }
 
     async function processReport() {
       const name = document.getElementById('dialerName').value.trim();
       const fileInput = document.getElementById('csvFileInput');
-      const textData = document.getElementById('reportData').value.trim();
 
       if (!name) {
-        alert("Kripya Dialer Name enter karein!");
+        alert("Please enter Dialer Name!");
         return;
       }
 
-      let rawContent = "";
-
-      // 1. If File selected, read file
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        rawContent = await file.text();
-      } else if (textData) {
-        rawContent = textData;
-      } else {
-        alert("Kripya CSV File select karein YA report text paste karein!");
+      if (fileInput.files.length === 0) {
+        alert("Please select a Vicidial CSV file!");
         return;
       }
 
-      parseAndSaveData(name, rawContent);
+      const file = fileInput.files[0];
+      const rawText = await file.text();
+      parseAndSaveData(name, rawText);
     }
 
     function parseAndSaveData(name, rawText) {
-      let calls = 0, d1 = 0, d5 = 0, d8 = 0, d9 = 0, sale = 0, totalDeals = 0;
+      const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      let agentsList = [];
 
-      const lines = rawText.split('\n');
+      lines.forEach((line) => {
+        if (line.includes('===') || line.includes('---') || line.toLowerCase().includes('user name')) return;
 
-      lines.forEach(line => {
-        const uppercaseLine = line.toUpperCase();
+        let parts = line.split(',');
+        if (parts.length < 3) parts = line.split(/\s+/);
 
-        // Check disposition occurrences or column values
-        if (uppercaseLine.includes('D1')) d1 += countMatches(line, 'D1');
-        if (uppercaseLine.includes('D5')) d5 += countMatches(line, 'D5');
-        if (uppercaseLine.includes('D8')) d8 += countMatches(line, 'D8');
-        if (uppercaseLine.includes('D9')) d9 += countMatches(line, 'D9');
-        if (uppercaseLine.includes('SALE')) sale += countMatches(line, 'SALE');
+        if (parts.length >= 3) {
+          const agentName = parts[0].replace(/"/gi, '').trim();
+          const calls = parseInt(parts[1].replace(/"/gi, '')) || parseInt(parts[2].replace(/"/gi, '')) || 0;
+
+          let d1 = countDispo(line, 'D1');
+          let d5 = countDispo(line, 'D5');
+          let d8 = countDispo(line, 'D8');
+          let d9 = countDispo(line, 'D9');
+          let sale = countDispo(line, 'SALE');
+
+          let totalDeals = parseInt(parts[parts.length - 1].replace(/"/gi, '')) || 0;
+          if ((d1 + d5 + d8 + d9 + sale) > totalDeals) {
+            totalDeals = d1 + d5 + d8 + d9 + sale;
+          }
+
+          if (agentName && agentName.length > 1 && !agentName.toUpperCase().includes('TOTAL')) {
+            agentsList.push({
+              agentId: Date.now() + Math.random(),
+              name: agentName,
+              calls: calls,
+              d1: d1,
+              d5: d5,
+              d8: d8,
+              d9: d9,
+              sale: sale,
+              deals: totalDeals,
+              conv: calls > 0 ? ((totalDeals / calls) * 100).toFixed(2) : '0.00'
+            });
+          }
+        }
       });
 
-      // CSV structured line parsing (Vicidial Export Format)
-      if (lines.length > 1 && lines[0].includes(',')) {
-        calls = 0; totalDeals = 0;
-        lines.forEach((l, idx) => {
-          if (idx > 0 && l.trim() !== "") {
-            const cols = l.split(',');
-            if (cols.length >= 3) {
-              const c = parseInt(cols[2].replace(/"/g, '')) || 0;
-              const d = parseInt(cols[cols.length - 1].replace(/"/g, '')) || 0;
-              calls += c;
-              totalDeals += d;
-            }
-          }
-        });
-      }
+      // Sort Agents: Top Deals Upar, Low Deals Niche
+      agentsList.sort((a, b) => b.deals - a.deals);
 
-      const extractedDeals = d1 + d5 + d8 + d9 + sale;
-      if (extractedDeals > totalDeals) totalDeals = extractedDeals;
-      if (calls === 0 && totalDeals > 0) calls = totalDeals * 4;
+      let totalCalls = 0, totalD1 = 0, totalD5 = 0, totalD8 = 0, totalD9 = 0, totalSALE = 0, grandDeals = 0;
+      agentsList.forEach(a => {
+        totalCalls += a.calls;
+        totalD1 += a.d1;
+        totalD5 += a.d5;
+        totalD8 += a.d8;
+        totalD9 += a.d9;
+        totalSALE += a.sale;
+        grandDeals += a.deals;
+      });
 
       const existingIdx = dialerReports.findIndex(d => d.name.toLowerCase() === name.toLowerCase());
 
       const item = {
         id: Date.now(),
-        name,
-        calls,
-        d1, d5, d8, d9, sale,
-        totalDeals,
-        updatedAt: new Date().toLocaleTimeString()
+        name: name,
+        agents: agentsList,
+        totalCalls: totalCalls,
+        d1: totalD1,
+        d5: totalD5,
+        d8: totalD8,
+        d9: totalD9,
+        sale: totalSALE,
+        grandDeals: grandDeals,
+        conv: totalCalls > 0 ? ((grandDeals / totalCalls) * 100).toFixed(2) : '0.00'
       };
 
       if (existingIdx >= 0) {
@@ -170,20 +216,41 @@
       }
 
       saveReports();
-
-      // Reset inputs
       document.getElementById('csvFileInput').value = '';
-      document.getElementById('reportData').value = '';
-      alert(`Report for "${name}" successfully processed and updated!`);
+      alert(`Report for "${name}" uploaded successfully!`);
     }
 
-    function countMatches(str, keyword) {
-      const re = new RegExp(keyword + '\\s*[:=,-]?\\s*(\\d+)', 'gi');
-      let match, total = 0;
-      while ((match = re.exec(str)) !== null) {
-        total += parseInt(match[1]) || 1;
+    function countDispo(str, code) {
+      const re = new RegExp(code + '\\s*[:=,-]?\\s*(\\d+)', 'gi');
+      let m = re.exec(str);
+      return m ? (parseInt(m[1]) || 0) : 0;
+    }
+
+    function editAgent(dialerId, agentId) {
+      const dialer = dialerReports.find(d => d.id === dialerId);
+      if (!dialer) return;
+
+      const agent = dialer.agents.find(a => a.agentId === agentId);
+      if (!agent) return;
+
+      const newCalls = prompt(`Edit Calls for Agent: ${agent.name}`, agent.calls);
+      const newDeals = prompt(`Edit Total Deals for Agent: ${agent.name}`, agent.deals);
+
+      if (newCalls !== null && newDeals !== null) {
+        agent.calls = parseInt(newCalls) || 0;
+        agent.deals = parseInt(newDeals) || 0;
+        agent.conv = agent.calls > 0 ? ((agent.deals / agent.calls) * 100).toFixed(2) : '0.00';
+
+        // Recalculate Dialer Totals
+        dialer.totalCalls = dialer.agents.reduce((sum, a) => sum + a.calls, 0);
+        dialer.grandDeals = dialer.agents.reduce((sum, a) => sum + a.deals, 0);
+        dialer.conv = dialer.totalCalls > 0 ? ((dialer.grandDeals / dialer.totalCalls) * 100).toFixed(2) : '0.00';
+
+        // Re-sort Agents
+        dialer.agents.sort((a, b) => b.deals - a.deals);
+
+        saveReports();
       }
-      return total > 0 ? total : 1;
     }
 
     function deleteReport(id) {
@@ -192,41 +259,123 @@
     }
 
     function clearAllData() {
-      if (confirm("Kyu aap tamam saved records clear karna chahte hain?")) {
+      if (confirm("Kyu aap tamam saved reports clear karna chahte hain?")) {
         dialerReports = [];
         saveReports();
       }
     }
 
-    function renderTable() {
-      const tbody = document.getElementById('summaryTable');
+    function renderTables() {
+      const summaryTbody = document.getElementById('summaryTable');
+      const allTeamTbody = document.getElementById('allTeamTable');
+      const breakdownContainer = document.getElementById('dialerBreakdownContainer');
 
       if (dialerReports.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11">No reports uploaded yet. Upload a CSV file or paste data above.</td></tr>';
+        summaryTbody.innerHTML = '<tr><td colspan="11">No reports uploaded yet.</td></tr>';
+        allTeamTbody.innerHTML = '<tr><td colspan="13">Upload CSV files to view consolidated team ranking.</td></tr>';
+        breakdownContainer.innerHTML = '<p style="color: #94a3b8; text-align: center;">Upload CSV files to view dialer wise breakdown.</p>';
         return;
       }
 
-      tbody.innerHTML = dialerReports.map(d => {
-        const conv = d.calls > 0 ? ((d.totalDeals / d.calls) * 100).toFixed(2) : '0.00';
+      // 1. Summary Table
+      summaryTbody.innerHTML = dialerReports.map(d => `
+        <tr>
+          <td><b>${d.name}</b></td>
+          <td>${d.agents.length}</td>
+          <td>${d.totalCalls}</td>
+          <td>${d.d1}</td>
+          <td>${d.d5}</td>
+          <td>${d.d8}</td>
+          <td>${d.d9}</td>
+          <td>${d.sale}</td>
+          <td class="hot">${d.grandDeals}</td>
+          <td>${d.conv}%</td>
+          <td><button class="btn-danger" onclick="deleteReport(${d.id})">🗑️ Delete</button></td>
+        </tr>
+      `).join('');
+
+      // 2. All Team Consolidated Performance (Top to Low)
+      let allAgents = [];
+      dialerReports.forEach(d => {
+        d.agents.forEach(a => {
+          allAgents.push({ ...a, dialerName: d.name, dialerId: d.id });
+        });
+      });
+
+      // Sort all team members globally
+      allAgents.sort((a, b) => b.deals - a.deals);
+
+      allTeamTbody.innerHTML = allAgents.map((a, idx) => {
+        const isTop = idx < 3 && a.deals > 0;
+        const isLow = a.deals === 0;
+        const rowClass = isTop ? 'top-performer' : (isLow ? 'low-performer' : '');
+        const badge = isTop ? '<span class="badge badge-top">🔥 TOP</span>' : (isLow ? '<span class="badge badge-low">⚠️ LOW</span>' : '<span>NORMAL</span>');
+
         return `
-          <tr>
-            <td><b>${d.name}</b></td>
-            <td>${d.calls}</td>
-            <td>${d.d1}</td>
-            <td>${d.d5}</td>
-            <td>${d.d8}</td>
-            <td>${d.d9}</td>
-            <td>${d.sale}</td>
-            <td class="hot">${d.totalDeals}</td>
-            <td>${conv}%</td>
-            <td><small>Updated: ${d.updatedAt}</small></td>
-            <td><button class="btn-danger" onclick="deleteReport(${d.id})">🗑️ Delete</button></td>
+          <tr class="${rowClass}">
+            <td><b>#${idx + 1}</b></td>
+            <td><b>${a.name}</b></td>
+            <td>${a.dialerName}</td>
+            <td>${a.calls}</td>
+            <td>${a.d1}</td>
+            <td>${a.d5}</td>
+            <td>${a.d8}</td>
+            <td>${a.d9}</td>
+            <td>${a.sale}</td>
+            <td class="${a.deals > 0 ? 'hot' : 'low'}">${a.deals}</td>
+            <td>${a.conv}%</td>
+            <td>${badge}</td>
+            <td><button class="btn-edit" onclick="editAgent(${a.dialerId}, ${a.agentId})">✏️ Edit</button></td>
           </tr>
         `;
       }).join('');
+
+      // 3. Individual Dialer Breakdown
+      breakdownContainer.innerHTML = dialerReports.map(d => `
+        <div style="margin-bottom: 25px;">
+          <h4 class="dialer-title">📞 Dialer: ${d.name} (${d.agents.length} Agents)</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Agent Name</th>
+                <th>Calls</th>
+                <th>D1</th>
+                <th>D5</th>
+                <th>D8</th>
+                <th>D9</th>
+                <th>SALE</th>
+                <th>Total Deals</th>
+                <th>Conv %</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${d.agents.map((a, idx) => {
+                const isTop = idx === 0 && a.deals > 0;
+                const isLow = a.deals === 0;
+                const rowClass = isTop ? 'top-performer' : (isLow ? 'low-performer' : '');
+                return `
+                  <tr class="${rowClass}">
+                    <td><b>${a.name}</b></td>
+                    <td>${a.calls}</td>
+                    <td>${a.d1}</td>
+                    <td>${a.d5}</td>
+                    <td>${a.d8}</td>
+                    <td>${a.d9}</td>
+                    <td>${a.sale}</td>
+                    <td class="${a.deals > 0 ? 'hot' : 'low'}">${a.deals}</td>
+                    <td>${a.conv}%</td>
+                    <td><button class="btn-edit" onclick="editAgent(${d.id},${a.agentId})">✏️ Edit</button></td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `).join('');
     }
 
-    renderTable();
+    renderTables();
   </script>
 
   <!-- Netlify Badge Hide -->
