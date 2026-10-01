@@ -9,14 +9,19 @@
     h1 { text-align: center; color: #38bdf8; margin-bottom: 20px; }
     .card { background-color: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); }
     .form-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-    input, select, button { padding: 10px; border-radius: 5px; border: 1px solid #334155; background-color: #0f172a; color: #fff; }
+    input, button { padding: 10px; border-radius: 5px; border: 1px solid #334155; background-color: #0f172a; color: #fff; }
     button { background-color: #0284c7; cursor: pointer; font-weight: bold; border: none; }
     button:hover { background-color: #0369a1; }
+    .btn-danger { background-color: #ef4444; padding: 5px 10px; font-size: 12px; }
+    .btn-danger:hover { background-color: #dc2626; }
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     th, td { border: 1px solid #334155; padding: 10px; text-align: center; }
     th { background-color: #334155; color: #38bdf8; }
     tr:nth-child(even) { background-color: #1a2234; }
     .hot { color: #4ade80; font-weight: bold; }
+    .status-badge { font-size: 12px; padding: 3px 8px; border-radius: 12px; }
+    .status-active { background-color: #065f46; color: #34d399; }
+    .status-err { background-color: #7f1d1d; color: #fca5a5; }
   </style>
 </head>
 <body>
@@ -28,10 +33,11 @@
     <h3>🔗 Connect New Vicidialer Link</h3>
     <div class="form-group">
       <input type="text" id="dialerName" placeholder="Dialer Name (e.g. USA Outbound)" required>
-      <input type="url" id="dialerUrl" placeholder="https://sbaca3.maxtelco.com/vicidial/non_agent_api.php" style="width: 400px;" required>
-      <input type="text" id="apiUser" placeholder="API User" required>
+      <input type="url" id="dialerUrl" placeholder="https://sbaca3.maxtelco.com/vicidial/non_agent_api.php" style="width: 380px;" required>
+      <input type="text" id="apiUser" placeholder="API User (e.g. MahnoorQA)" required>
       <input type="password" id="apiPass" placeholder="API Password" required>
       <button onclick="addDialer()">Connect Dialer</button>
+      <button onclick="clearAllDialers()" style="background-color: #64748b;">Clear All</button>
     </div>
   </div>
 
@@ -52,10 +58,11 @@
           <th>Conversion %</th>
           <th>🔥 Last Hour Sales</th>
           <th>Status</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody id="dialerSummaryTable">
-        <tr><td colspan="11">No dialer connected yet. Add a link above.</td></tr>
+        <tr><td colspan="12">No dialer connected yet. Add a link above.</td></tr>
       </tbody>
     </table>
   </div>
@@ -70,37 +77,60 @@
 
     function addDialer() {
       const name = document.getElementById('dialerName').value;
-      let url = document.getElementById('dialerUrl').value;
+      let rawUrl = document.getElementById('dialerUrl').value;
       const user = document.getElementById('apiUser').value;
       const pass = document.getElementById('apiPass').value;
 
-      if (!name || !url || !user || !pass) {
+      if (!name || !rawUrl || !user || !pass) {
         alert("Sari details fill karein!");
         return;
       }
 
-      if (!url.includes('non_agent_api.php')) {
-        url = url.substring(0, url.lastIndexOf('/')) + '/non_agent_api.php';
-      }
+      // Automatically construct correct non_agent_api.php URL regardless of what link user pasted
+      let baseUrl = rawUrl.split('/vicidial/')[0];
+      if (!baseUrl.startsWith('http')) baseUrl = 'https://' + baseUrl;
+      const cleanUrl = `${baseUrl}/vicidial/non_agent_api.php`;
 
       dialers.push({ 
-        name, url, user, pass, 
-        totalCalls: 0, d1: 0, d5: 0, d8: 0, d9: 0, sale: 0, totalDeals: 0, lastHourSales: 0 
+        id: Date.now(),
+        name, 
+        url: cleanUrl, 
+        user, 
+        pass, 
+        totalCalls: 0, d1: 0, d5: 0, d8: 0, d9: 0, sale: 0, totalDeals: 0, lastHourSales: 0,
+        status: 'Checking...'
       });
+      
       saveDialers();
       fetchLiveMetrics();
-      alert("Dialer Link Saved Successfully!");
+      alert("Dialer Added! Fetching Live Data...");
+    }
+
+    function deleteDialer(id) {
+      dialers = dialers.filter(d => d.id !== id);
+      saveDialers();
+    }
+
+    function clearAllDialers() {
+      if(confirm("Kyu aap saare dialers remove karna chahte hain?")) {
+        dialers = [];
+        saveDialers();
+      }
     }
 
     function renderSummary() {
       const tbody = document.getElementById('dialerSummaryTable');
       if (dialers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11">No dialer connected yet. Add a link above.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12">No dialer connected yet. Add a link above.</td></tr>';
         return;
       }
 
       tbody.innerHTML = dialers.map(d => {
         const conv = d.totalCalls > 0 ? ((d.totalDeals / d.totalCalls) * 100).toFixed(2) : '0.00';
+        const statusBadge = d.status === 'Active' 
+          ? '<span class="status-badge status-active">🟢 Live</span>'
+          : `<span class="status-badge status-err">${d.status}</span>`;
+
         return `
           <tr>
             <td><b>${d.name}</b></td>
@@ -113,7 +143,8 @@
             <td><b>${d.totalDeals}</b></td>
             <td>${conv}%</td>
             <td class="hot">${d.lastHourSales || 0} Deals</td>
-            <td>🟢 Live (Auto-Refresh)</td>
+            <td>${statusBadge}</td>
+            <td><button class="btn-danger" onclick="deleteDialer(${d.id})">🗑️ Remove</button></td>
           </tr>
         `;
       }).join('');
@@ -121,15 +152,15 @@
 
     async function fetchLiveMetrics() {
       for (let d of dialers) {
-        const rawApiUrl = `${d.url}?source=reporter&user=${d.user}&pass=${d.pass}&function=agent_stats_export&stage=csv`;
-        // CORS proxy bypass URL
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rawApiUrl)}`;
-        
+        // Query Vicidial Agent Status via Non-Agent API
+        const targetUrl = `${d.url}?source=reporter&user=${encodeURIComponent(d.user)}&pass=${encodeURIComponent(d.pass)}&function=agent_stats_export&stage=csv`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+
         try {
           const response = await fetch(proxyUrl);
           const result = await response.json();
           const data = result.contents;
-          
+
           if (data && !data.includes("ERROR")) {
             const lines = data.trim().split("\n");
             let calls = 0, deals = 0;
@@ -137,7 +168,7 @@
             lines.forEach((line, index) => {
               if (index > 0) {
                 const cols = line.split(",");
-                if (cols.length > 3) {
+                if (cols.length >= 3) {
                   calls += parseInt(cols[2] || 0);
                   deals += parseInt(cols[cols.length - 1] || 0);
                 }
@@ -146,18 +177,25 @@
 
             d.totalCalls = calls;
             d.totalDeals = deals;
+            d.sale = deals;
+            d.status = 'Active';
+          } else if (data && data.includes("ERROR")) {
+            d.status = 'Auth Error / Bad User/Pass';
+          } else {
+            d.status = 'No Data Returned';
           }
         } catch (err) {
-          console.log("Network error for:", d.name);
+          d.status = 'CORS/Connection Error';
         }
       }
       renderSummary();
     }
 
-    setInterval(fetchLiveMetrics, 60000);
+    setInterval(fetchLiveMetrics, 30000);
     renderSummary();
   </script>
 
+  <!-- Netlify Badge Removal -->
   <style>
     [data-netlify-deploy-id], .netlify-badge, #netlify-badge, netlify-plugin-drawer, iframe[src*="netlify"] {
       display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;
