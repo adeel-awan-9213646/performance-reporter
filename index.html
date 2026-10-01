@@ -1,61 +1,537 @@
-// 1. Dynamic Column Rendering & Filtering Logic
-function renderAgentTable(agentsData, selectedTeam) {
-    // Filter agents by team tag
-    let filteredAgents = agentsData.filter(agent => {
-        if (selectedTeam === 'All Teams') return true;
-        return agent.name.toLowerCase().includes(selectedTeam.toLowerCase());
-    });
-
-    // 2. Sort by Total Calls / Performance High to Low
-    filteredAgents.sort((a, b) => b.totalCalls - a.totalCalls);
-
-    // 3. Find active Dispositions (D1 to D9) where sale > 0
-    let activeDispositions = [];
-    for (let i = 1; i <= 9; i++) {
-        let dKey = 'D' + i;
-        let hasSales = filteredAgents.some(agent => agent[dKey] && agent[dKey] > 0);
-        if (hasSales) {
-            activeDispositions.push(dKey);
-        }
-    }
-
-    // 4. Determine Max/Min for Color Thresholds
-    let maxCalls = Math.max(...filteredAgents.map(a => a.totalCalls));
-    
-    // Generate Table Headers
-    let headerHTML = `<tr>
-        <th style="min-width: 180px;">Agent Name</th>
-        <th style="min-width: 100px;">Agent ID</th>
-        <th style="min-width: 120px;">Total Calls</th>`;
-    
-    activeDispositions.forEach(d => {
-        headerHTML += `<th style="min-width: 80px;">${d}</th>`;
-    });
-    headerHTML += `</tr>`;
-
-    // Generate Table Rows with Editable Fields & Color Coding
-    let rowsHTML = filteredAgents.map(agent => {
-        // Color Assignment Logic
-        let rowClass = 'bg-yellow'; // Default Average
-        if (agent.totalCalls >= maxCalls * 0.8) {
-            rowClass = 'bg-green'; // Top Performer
-        } else if (agent.totalCalls < maxCalls * 0.4) {
-            rowClass = 'bg-red'; // Low Performer
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Reporter</title>
+    <!-- html2canvas for Screenshot button -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        let row = `<tr class="${rowClass}">
-            <td contenteditable="true">${agent.name}</td>
-            <td contenteditable="true">${agent.id}</td>
-            <td contenteditable="true">${agent.totalCalls}</td>`;
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            padding: 30px 15px;
+            display: flex;
+            justify-content: center;
+        }
 
-        activeDispositions.forEach(d => {
-            row += `<td contenteditable="true">${agent[d] || 0}</td>`;
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Title Header */
+        .title-header h1 {
+            font-size: 38px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .title-header p {
+            font-size: 16px;
+            color: #4b5563;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Controls Row 1 */
+        .control-row-1 {
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-box, .select-box {
+            border: 2px solid #000000;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 18px;
+            font-weight: 800;
+            outline: none;
+            background: white;
+        }
+
+        .input-box {
+            flex: 1;
+        }
+
+        .select-box {
+            flex: 1;
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        /* Buttons Row 2 */
+        .control-row-2 {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-black {
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-black:hover {
+            opacity: 0.85;
+        }
+
+        /* Dotted Upload Box */
+        .upload-box {
+            border: 2px dashed #000000;
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #ffffff;
+        }
+
+        .upload-box input {
+            display: none;
+        }
+
+        /* Teams Container */
+        .teams-container {
+            border: 2px solid #000000;
+            border-radius: 20px;
+            padding: 14px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 10px;
+            background-color: #ffffff;
+        }
+
+        .team-pill {
+            border: 2px solid #000000;
+            border-radius: 25px;
+            padding: 6px 18px;
+            font-size: 15px;
+            font-weight: 800;
+            background: white;
+            color: black;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .team-pill.active {
+            background: black;
+            color: white;
+        }
+
+        /* Main Card Table Area */
+        .card-container {
+            background-color: #000000;
+            border-radius: 24px;
+            padding: 20px;
+            color: white;
+            overflow-x: auto;
+        }
+
+        .card-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+
+        .filename-text {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            font-family: monospace;
+        }
+
+        .badge-agents {
+            background-color: #00a86b;
+            color: #000000;
+            font-size: 13px;
+            font-weight: 900;
+            padding: 6px 14px;
+            border-radius: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Big Title Banner inside Card */
+        .manager-title-banner {
+            background-color: #00a86b;
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 900;
+            text-align: center;
+            padding: 12px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Excel-Like Table Design */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .reporter-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            min-width: 650px;
+        }
+
+        .reporter-table th {
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 900;
+            text-align: center;
+            padding: 8px 12px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .reporter-table th:first-child {
+            text-align: left;
+            padding-left: 16px;
+            min-width: 180px;
+        }
+
+        /* Row Color Tiers */
+        .reporter-table tbody tr.tier-top {
+            background-color: #00a86b !important; /* Green for Top Performers */
+            color: #ffffff;
+        }
+
+        .reporter-table tbody tr.tier-mid {
+            background-color: #e6a100 !important; /* Orange/Yellow for Mid Performers */
+            color: #ffffff;
+        }
+
+        .reporter-table tbody tr.tier-low {
+            background-color: #d93838 !important; /* Red for Low Performers */
+            color: #ffffff;
+        }
+
+        .reporter-table td {
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 15px;
+            white-space: nowrap;
+            outline: none;
+        }
+
+        .reporter-table td[contenteditable="true"]:hover {
+            outline: 2px dashed #ffffff;
+            cursor: text;
+        }
+
+        .reporter-table td:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            text-align: left;
+            padding-left: 16px;
+        }
+
+        .reporter-table td:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .conv-val {
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="title-header">
+        <h1>Performance Reporter</h1>
+        <p>Automated Vicidialer Transformation</p>
+    </div>
+
+    <!-- Controls Row 1 -->
+    <div class="control-row-1">
+        <input type="text" id="managerInput" class="input-box" value="Qaiser Khan" placeholder="Manager / Leader Name">
+        <select id="themeSelect" class="select-box" onchange="applyColorTiering()">
+            <option value="auto">🚦 Performance Tiers (Green/Yellow/Red)</option>
+            <option value="#00a86b">🟢 All Green</option>
+            <option value="#007bff">🔵 All Blue</option>
+            <option value="#6f42c1">🟣 All Purple</option>
+        </select>
+    </div>
+
+    <!-- Controls Row 2 -->
+    <div class="control-row-2">
+        <button class="btn-black" onclick="resetData()">Reset</button>
+        <button class="btn-black" onclick="copyScreenshot()">Copy Screenshot</button>
+    </div>
+
+    <!-- File Upload Box -->
+    <div class="upload-box" onclick="document.getElementById('csvFileInput').click()">
+        📄 📑 <span>Upload / Drag & Drop Vicidialer CSV File</span>
+        <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileUpload(event)">
+    </div>
+
+    <!-- Team Filters -->
+    <div class="teams-container" id="teamsFilterContainer">
+        <button class="team-pill active" onclick="filterTeam('All Teams', this)">All Teams</button>
+        <button class="team-pill" onclick="filterTeam('OTHER', this)">OTHER</button>
+        <button class="team-pill" onclick="filterTeam('2.0', this)">2.0</button>
+        <button class="team-pill" onclick="filterTeam('HQ', this)">HQ</button>
+        <button class="team-pill" onclick="filterTeam('2.1', this)">2.1</button>
+        <button class="team-pill" onclick="filterTeam('Team A', this)">Team A</button>
+        <button class="team-pill" onclick="filterTeam('HQ new', this)">HQ new</button>
+        <button class="team-pill" onclick="filterTeam('2.0NB', this)">2.0NB</button>
+        <button class="team-pill" onclick="filterTeam('3.0', this)">3.0</button>
+        <button class="team-pill" onclick="filterTeam('3.1', this)">3.1</button>
+    </div>
+
+    <!-- Report Card Container -->
+    <div class="card-container" id="captureCard">
+        <div class="card-header-top">
+            <span class="filename-text" id="filenameDisplay">AGENT_PERFORMACE_DETAIL20261001-104413.csv</span>
+            <span class="badge-agents" id="agentCountBadge">5 AGENTS DETECTED</span>
+        </div>
+
+        <div class="manager-title-banner" id="cardManagerTitle">
+            Qaiser Khan
+        </div>
+
+        <div class="table-responsive">
+            <table class="reporter-table">
+                <thead>
+                    <tr id="tableHeaderRow">
+                        <th>USER</th>
+                        <th>ID</th>
+                        <th>TOTAL CALLS</th>
+                        <th>D1</th>
+                        <th>D5</th>
+                        <th>D8</th>
+                        <th>TOTAL SALES</th>
+                        <th>CONV %</th>
+                    </tr>
+                </thead>
+                <tbody id="agentTableBody">
+                    <!-- Sample Data matching requested structure -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let rawAgentsData = [
+        { name: "Michael Tolliver-HQ", id: "1001", totalCalls: 184, d1: 69, d5: 38, d8: 77, d9: 0, sales: 82, conv: "44.5%" },
+        { name: "Danny Parker 2.0", id: "2018", totalCalls: 177, d1: 79, d5: 23, d8: 75, d9: 0, sales: 79, conv: "44.6%" },
+        { name: "Dan Muccray-HQ", id: "1016", totalCalls: 169, d1: 59, d5: 46, d8: 64, d9: 0, sales: 71, conv: "42.0%" },
+        { name: "Jordan Ford-HQ", id: "1002", totalCalls: 145, d1: 58, d5: 22, d8: 65, d9: 0, sales: 64, conv: "44.1%" },
+        { name: "Bryan Grayson 2.1", id: "2004", totalCalls: 125, d1: 53, d5: 14, d8: 58, d9: 0, sales: 55, conv: "44.0%" }
+    ];
+
+    let currentSelectedTeam = "All Teams";
+
+    // Manager Title Sync
+    const managerInput = document.getElementById('managerInput');
+    const cardManagerTitle = document.getElementById('cardManagerTitle');
+    managerInput.addEventListener('input', function() {
+        cardManagerTitle.innerText = this.value || 'Manager Name';
+    });
+
+    // Initial Render
+    renderDashboard();
+
+    function renderDashboard() {
+        // 1. Filter Agents by Selected Team
+        let filtered = rawAgentsData.filter(agent => {
+            if (currentSelectedTeam === "All Teams") return true;
+            return agent.name.toLowerCase().includes(currentSelectedTeam.toLowerCase());
         });
 
-        row += `</tr>`;
-        return row;
-    }).join('');
+        // 2. Sort High to Low Performance (by Total Calls/Sales)
+        filtered.sort((a, b) => b.totalCalls - a.totalCalls);
 
-    document.getElementById('tableHeader').innerHTML = headerHTML;
-    document.getElementById('tableBody').innerHTML = rowsHTML;
-}
+        // 3. Find Dynamic Dispositions (D1 to D9) where sales/activity > 0
+        let activeDispositions = [];
+        for (let i = 1; i <= 9; i++) {
+            let key = 'd' + i;
+            let hasValue = filtered.some(a => a[key] && Number(a[key]) > 0);
+            if (hasValue) {
+                activeDispositions.push(i);
+            }
+        }
+
+        // 4. Build Table Header
+        let headerHTML = `<th>USER</th><th>ID</th><th>TOTAL CALLS</th>`;
+        activeDispositions.forEach(dNum => {
+            headerHTML += `<th>D${dNum}</th>`;
+        });
+        headerHTML += `<th>TOTAL SALES</th><th>CONV %</th>`;
+        document.getElementById('tableHeaderRow').innerHTML = headerHTML;
+
+        // 5. Build Table Rows with Performance Tiers
+        let tbody = document.getElementById('agentTableBody');
+        tbody.innerHTML = '';
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 20px;">No agents found for team ${currentSelectedTeam}</td></tr>`;
+            document.getElementById('agentCountBadge').innerText = `0 AGENTS DETECTED`;
+            return;
+        }
+
+        let maxCalls = Math.max(...filtered.map(a => a.totalCalls || 0));
+
+        filtered.forEach((agent, index) => {
+            let tr = document.createElement('tr');
+            
+            // Assign Tier Class (Green for Top, Yellow for Mid, Red for Low)
+            let tierClass = 'tier-top';
+            if (index >= Math.ceil(filtered.length * 0.7)) {
+                tierClass = 'tier-low';
+            } else if (index >= Math.ceil(filtered.length * 0.3)) {
+                tierClass = 'tier-mid';
+            }
+            tr.className = tierClass;
+
+            let rowContent = `
+                <td contenteditable="true">${agent.name}</td>
+                <td contenteditable="true">${agent.id}</td>
+                <td contenteditable="true">${agent.totalCalls}</td>
+            `;
+
+            activeDispositions.forEach(dNum => {
+                let key = 'd' + dNum;
+                rowContent += `<td contenteditable="true">${agent[key] || 0}</td>`;
+            });
+
+            rowContent += `
+                <td contenteditable="true">${agent.sales}</td>
+                <td contenteditable="true" class="conv-val">${agent.conv}</td>
+            `;
+
+            tr.innerHTML = rowContent;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('agentCountBadge').innerText = `${filtered.length} AGENTS DETECTED`;
+        applyColorTiering();
+    }
+
+    function applyColorTiering() {
+        let theme = document.getElementById('themeSelect').value;
+        let rows = document.querySelectorAll('#agentTableBody tr');
+        
+        rows.forEach(tr => {
+            if (theme === 'auto') {
+                tr.style.backgroundColor = '';
+            } else {
+                tr.style.backgroundColor = theme;
+            }
+        });
+    }
+
+    function filterTeam(teamName, btn) {
+        currentSelectedTeam = teamName;
+        document.querySelectorAll('.team-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        renderDashboard();
+    }
+
+    function resetData() {
+        managerInput.value = "Qaiser Khan";
+        cardManagerTitle.innerText = "Qaiser Khan";
+        document.getElementById('filenameDisplay').innerText = "NO FILE UPLOADED";
+        rawAgentsData = [];
+        renderDashboard();
+    }
+
+    function copyScreenshot() {
+        const card = document.getElementById('captureCard');
+        html2canvas(card, { scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+                try {
+                    navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    alert('Screenshot copied to clipboard!');
+                } catch (err) {
+                    const link = document.createElement('a');
+                    link.download = 'performance-report.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                }
+            });
+        });
+    }
+
+    // CSV Reader
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('filenameDisplay').innerText = file.name;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            parseCSV(e.target.result);
+        };
+        reader.readAsText(file);
+    }
+
+    function parseCSV(text) {
+        const lines = text.split('\n').filter(l => l.trim().length > 0);
+        if (lines.length < 2) return;
+
+        rawAgentsData = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
+            if (cols.length >= 8) {
+                rawAgentsData.push({
+                    name: cols[0] || 'Agent',
+                    id: cols[1] || '-',
+                    totalCalls: parseInt(cols[5]) || parseInt(cols[2]) || 0,
+                    d1: parseInt(cols[2]) || 0,
+                    d5: parseInt(cols[3]) || 0,
+                    d8: parseInt(cols[4]) || 0,
+                    d9: parseInt(cols[9]) || 0,
+                    sales: parseInt(cols[6]) || 0,
+                    conv: cols[7] || '0%'
+                });
+            }
+        }
+
+        renderDashboard();
+    }
+</script>
+
+</body>
+</html>
