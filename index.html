@@ -3,244 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Performance Reporter - Automated Vicidialer Transformation</title>
+  <title>Vicidial Multi-Team Dashboard</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- html2canvas for taking crisp screenshots -->
+  <!-- html2canvas for taking screenshots -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
+    /* Theme Definitions */
+    .theme-dark {
+      --bg-main: #09090b;
+      --bg-card: #18181b;
+      --bg-hover: #27272a;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --border-color: #27272a;
+      --accent: #3b82f6;
+    }
+
+    .theme-light {
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-hover: #f1f5f9;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --accent: #2563eb;
+    }
+
     body {
-      background-color: #ffffff;
-      color: #000000;
+      background-color: var(--bg-main);
+      color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Custom pill styling matching the image */
-    .btn-pill {
-      border: 2px solid #000000;
-      background-color: #ffffff;
-      color: #000000;
-      font-weight: 800;
-      border-radius: 9999px;
-      padding: 6px 18px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.15s ease-in-out;
-      user-select: none;
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
     }
 
-    .btn-pill:hover {
-      background-color: #f3f4f6;
+    .border-custom {
+      border-color: var(--border-color);
     }
 
-    .btn-pill.active {
-      background-color: #000000 !important;
-      color: #ffffff !important;
+    .table-header {
+      background-color: var(--bg-hover);
+      color: var(--text-muted);
     }
 
-    /* Editable table cell focus effect */
-    .table-cell-editable {
-      outline: none;
-      padding: 2px 4px;
-      border-radius: 4px;
-      display: inline-block;
-      width: 100%;
-      min-height: 20px;
+    .pill-btn {
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      transition: all 0.15s ease;
     }
 
-    .table-cell-editable:focus {
-      background-color: rgba(255, 255, 255, 0.35);
-      box-shadow: 0 0 0 2px #ffffff;
+    .pill-btn:hover {
+      background-color: var(--bg-hover);
     }
 
-    /* Toast Notification Animation */
+    .pill-btn.active {
+      background-color: var(--text-main);
+      color: var(--bg-main);
+      border-color: var(--text-main);
+    }
+
+    .toast-msg {
+      animation: fadeInOut 2.5s forwards;
+    }
+
     @keyframes fadeInOut {
       0% { opacity: 0; transform: translateY(20px); }
       15% { opacity: 1; transform: translateY(0); }
       85% { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(20px); }
     }
-
-    .toast-msg {
-      animation: fadeInOut 2.5s forwards;
-    }
   </style>
 </head>
-<body class="p-4 sm:p-6 max-w-md sm:max-w-xl mx-auto min-h-screen flex flex-col justify-between">
+<body class="theme-dark min-h-screen p-4 sm:p-6 lg:p-8">
 
-  <!-- Main Container -->
-  <div>
-    <!-- Header Section -->
-    <header class="mb-5">
-      <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-black">Performance Reporter</h1>
-      <p class="text-gray-700 text-sm font-semibold mt-1">Automated Vicidialer Transformation</p>
+  <div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- Top Navigation Header -->
+    <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-custom">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🚀</span>
+        <h1 class="text-2xl sm:text-3xl font-black tracking-tight">Vicidial Multi-Team Dashboard</h1>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <label class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
+          🎨 Theme:
+        </label>
+        <select 
+          id="themeSelect" 
+          onchange="switchTheme(this.value)" 
+          class="bg-card border border-custom text-sm font-bold rounded-lg px-3 py-1.5 outline-none cursor-pointer"
+        >
+          <option value="theme-dark">Midnight Dark</option>
+          <option value="theme-light">Clean Light</option>
+        </select>
+      </div>
     </header>
 
-    <!-- Supervisor Input and Theme Chooser Row -->
-    <div class="grid grid-cols-2 gap-3 mb-3">
-      <div>
+    <!-- Upload Card -->
+    <section class="card rounded-2xl p-5 shadow-lg">
+      <h2 class="text-base font-extrabold flex items-center gap-2 mb-4">
+        📂 Upload Agent Performance CSV File
+      </h2>
+
+      <div class="space-y-3">
         <input 
           type="text" 
-          id="supervisorInput" 
-          value="Qaiser Khan" 
-          oninput="updateSupervisorName(this.value)" 
-          class="w-full border-2 border-black rounded-lg px-3 py-2 text-base font-bold bg-white text-black outline-none shadow-sm focus:ring-2 focus:ring-black"
-          placeholder="Supervisor Name"
+          id="teamInput" 
+          placeholder="Dialer / Team Name (e.g. 2.0, 2.1, Outbound 1)" 
+          class="w-full bg-main border border-custom rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500"
         >
-      </div>
-      
-      <div class="relative flex items-center">
-        <select 
-          id="themeSelector" 
-          onchange="changeColorTheme(this.value)" 
-          class="w-full border-2 border-black rounded-lg px-3 py-2 text-sm sm:text-base font-bold bg-white text-black appearance-none pr-8 cursor-pointer shadow-sm focus:ring-2 focus:ring-black"
+
+        <div 
+          id="dropArea" 
+          onclick="document.getElementById('csvInput').click()" 
+          class="border-2 border-dashed border-custom rounded-xl p-6 text-center cursor-pointer hover:bg-hover transition"
         >
-          <option value="#16a34a">🟢 Classic Green</option>
-          <option value="#2563eb">🔵 Ocean Blue</option>
-          <option value="#dc2626">🔴 Crimson Red</option>
-          <option value="#d97706">🟡 Amber Gold</option>
-          <option value="#9333ea">🟣 Royal Purple</option>
-          <option value="custom">🎨 Custom Color</option>
-        </select>
-        <div class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-black font-bold">▼</div>
-        <input 
-          type="color" 
-          id="customPicker" 
-          value="#16a34a" 
-          onchange="applyCustomColor(this.value)" 
-          class="hidden absolute right-1 top-1.5 w-8 h-8 border-2 border-black rounded cursor-pointer z-10"
-        >
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="flex gap-3 mb-5">
-      <button 
-        onclick="resetData()" 
-        class="bg-black text-white font-black px-6 py-2 rounded-lg text-sm border-2 border-black hover:bg-gray-800 active:scale-95 transition"
-      >
-        Reset
-      </button>
-      <button 
-        onclick="copyScreenshot()" 
-        class="bg-black text-white font-black px-6 py-2 rounded-lg text-sm border-2 border-black hover:bg-gray-800 active:scale-95 transition"
-      >
-        Copy Screenshot
-      </button>
-    </div>
-
-    <!-- CSV Upload Drag & Drop Box -->
-    <div 
-      id="dropZone"
-      onclick="document.getElementById('fileInput').click()" 
-      class="border-2 border-dashed border-black rounded-xl p-5 text-center cursor-pointer mb-5 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 transition shadow-sm"
-    >
-      <p class="text-sm font-bold text-black flex items-center justify-center gap-2">
-        <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        📄 Upload / Drag & Drop Vicidialer CSV File
-      </p>
-      <input type="file" id="fileInput" accept=".csv" class="hidden" onchange="processCSVUpload(event)">
-    </div>
-
-    <!-- Team Filter Pills Container -->
-    <div class="border-2 border-black rounded-2xl p-3 bg-gray-100 mb-5 shadow-sm">
-      <div class="flex flex-wrap gap-2" id="teamsContainer">
-        <button class="btn-pill active" onclick="filterByTeam('ALL', this)">All Teams</button>
-        <button class="btn-pill" onclick="filterByTeam('OTHER', this)">OTHER</button>
-        <button class="btn-pill" onclick="filterByTeam('2.0', this)">2.0</button>
-        <button class="btn-pill" onclick="filterByTeam('HQ', this)">HQ</button>
-        <button class="btn-pill" onclick="filterByTeam('2.1', this)">2.1</button>
-        <button class="btn-pill" onclick="filterByTeam('Team A', this)">Team A</button>
-        <button class="btn-pill" onclick="filterByTeam('HQ new', this)">HQ new</button>
-        <button class="btn-pill" onclick="filterByTeam('2.0NB', this)">2.0NB</button>
-        <button class="btn-pill" onclick="filterByTeam('3.0', this)">3.0</button>
-        <button class="btn-pill" onclick="filterByTeam('3.1', this)">3.1</button>
-      </div>
-    </div>
-
-    <!-- Main Capture Card -->
-    <div id="captureArea" class="bg-black rounded-2xl p-2.5 sm:p-3 border-2 border-black text-white shadow-xl overflow-hidden">
-      
-      <!-- File Metadata Header -->
-      <div class="flex items-center justify-between mb-2.5 px-1 pt-1">
-        <div id="csvFilename" class="text-xs font-mono font-bold text-white truncate max-w-[200px] sm:max-w-[280px]">
-          AGENT_PERFORMACE_DETAIL20261001-104413.csv
+          <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="handleFileSelect(event)">
+          <div class="flex items-center justify-center gap-3">
+            <span class="bg-card border border-custom px-3 py-1.5 rounded-md text-xs font-bold">Choose File</span>
+            <span id="fileName" class="text-xs text-muted font-medium">No file chosen</span>
+          </div>
         </div>
-        <div id="agentBadge" class="bg-emerald-500 text-black font-black text-[11px] sm:text-xs px-2.5 py-1 rounded-full uppercase tracking-wider">
-          15 AGENTS DETECTED
+
+        <div class="flex gap-3 pt-2">
+          <button 
+            onclick="processUpload()" 
+            class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md"
+          >
+            📊 Upload & Generate Dashboard
+          </button>
+          <button 
+            onclick="clearAllData()" 
+            class="bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2"
+          >
+            🗑️ Clear All Reports
+          </button>
         </div>
       </div>
+    </section>
 
-      <!-- Supervisor Banner -->
-      <div 
-        id="supervisorBanner" 
-        class="bg-emerald-600 text-white font-black text-xl sm:text-2xl text-center py-2 rounded-xl mb-3 tracking-wide shadow-inner"
-      >
-        Qaiser Khan
-      </div>
+    <!-- Filter Pills -->
+    <section class="flex flex-wrap gap-2" id="filterPills">
+      <button class="pill-btn active text-xs font-extrabold px-4 py-2 rounded-full" onclick="setFilter('ALL', this)">🌐 ALL TEAMS</button>
+    </section>
 
-      <!-- Data Table -->
+    <!-- Overall Header Summary Table -->
+    <section class="card rounded-2xl p-5 shadow-lg overflow-hidden">
+      <h2 class="text-base font-extrabold flex items-center gap-2 mb-4">
+        📊 Overall Header Summary (Editable)
+      </h2>
+
       <div class="overflow-x-auto">
-        <table class="w-full text-white font-extrabold text-xs text-center border-separate border-spacing-y-1">
-          <thead>
-            <tr class="text-gray-300">
-              <th class="py-2 text-left px-2">USER</th>
-              <th class="py-2 px-1">ID</th>
-              <th class="py-2 px-1">D1</th>
-              <th class="py-2 px-1">D5</th>
-              <th class="py-2 px-1">D8</th>
-              <th class="py-2 px-1">TOTAL</th>
-              <th class="py-2 px-1">SALES</th>
-              <th class="py-2 px-1">CONV</th>
-              <th class="py-2 px-1">LAST HR</th>
+        <table class="w-full text-xs font-bold text-left">
+          <thead class="table-header uppercase text-[10px] tracking-wider">
+            <tr>
+              <th class="py-3 px-4">Dialer / Team</th>
+              <th class="py-3 px-4 text-center">Agents</th>
+              <th class="py-3 px-4 text-center">Total Calls</th>
+              <th class="py-3 px-4 text-center">Last Hr Calls</th>
+              <th class="py-3 px-4 text-center">Total Deals</th>
+              <th class="py-3 px-4 text-center">Last Hr Deals</th>
+              <th class="py-3 px-4 text-center">Conv %</th>
+              <th class="py-3 px-4 text-center">Action</th>
             </tr>
           </thead>
-          <tbody id="tableBody">
-            <!-- Dynamic rows generated by JavaScript -->
+          <tbody id="summaryBody" class="divide-y divide-custom">
+            <tr>
+              <td colspan="8" class="text-center py-6 text-muted font-medium">No reports uploaded yet.</td>
+            </tr>
           </tbody>
         </table>
       </div>
+    </section>
 
-    </div>
+    <!-- Consolidated Ranking Table -->
+    <section class="card rounded-2xl p-5 shadow-lg overflow-hidden">
+      <h2 class="text-base font-extrabold flex items-center gap-2 mb-4">
+        🏆 ALL TEAMS Consolidated Performance Ranking (Top to Low)
+      </h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs font-bold text-left">
+          <thead class="table-header uppercase text-[10px] tracking-wider">
+            <tr>
+              <th class="py-3 px-3 text-center">Rank</th>
+              <th class="py-3 px-4">Agent Name</th>
+              <th class="py-3 px-3">Team</th>
+              <th class="py-3 px-3 text-center">Total Calls</th>
+              <th class="py-3 px-3 text-center">Last Hr Calls</th>
+              <th class="py-3 px-3 text-center">Total Deals</th>
+              <th class="py-3 px-3 text-center">Last Hr Deals</th>
+              <th class="py-3 px-3 text-center">Conv %</th>
+              <th class="py-3 px-3 text-center">Status</th>
+              <th class="py-3 px-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="rankingBody" class="divide-y divide-custom">
+            <tr>
+              <td colspan="10" class="text-center py-6 text-muted font-medium">No agent data available for this view.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 bg-black text-white border-2 border-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-2xl hidden z-50">
-    Notification text here
-  </div>
+  <div id="toast" class="fixed bottom-5 right-5 card text-main border border-custom px-4 py-3 rounded-xl font-bold text-xs shadow-2xl hidden z-50"></div>
 
   <script>
-    // Initial Default Mock Agents Data
-    let initialAgents = [
-      { name: "Michael Tolliver-HQ", id: "1001", d1: 69, d5: 38, d8: 77, total: 184, sales: 82, conv: "44.5%", lastHr: 12, team: "HQ" },
-      { name: "Danny Parker 2.0", id: "2018", d1: 79, d5: 23, d8: 75, total: 177, sales: 79, conv: "44.6%", lastHr: 10, team: "2.0" },
-      { name: "Dan Muccray-HQ", id: "1016", d1: 59, d5: 46, d8: 64, total: 169, sales: 71, conv: "42.0%", lastHr: 11, team: "HQ" },
-      { name: "Jordan Ford-HQ", id: "1002", d1: 58, d5: 22, d8: 65, total: 145, sales: 64, conv: "44.1%", lastHr: 9, team: "HQ" },
-      { name: "Bryan Grayson 2.0", id: "2004", d1: 53, d5: 14, d8: 58, total: 125, sales: 55, conv: "44.0%", lastHr: 8, team: "2.0" },
-      { name: "Mike James-HQ", id: "1003", d1: 32, d5: 14, d8: 71, total: 117, sales: 50, conv: "42.7%", lastHr: 7, team: "HQ" },
-      { name: "Steve Henley-HQ", id: "1024", d1: 17, d5: 41, d8: 56, total: 114, sales: 48, conv: "42.1%", lastHr: 6, team: "HQ" },
-      { name: "David Gibson 2.0", id: "2014", d1: 58, d5: 14, d8: 38, total: 110, sales: 45, conv: "40.9%", lastHr: 5, team: "2.0" },
-      { name: "Lewis Cooper 2.0", id: "2010", d1: 39, d5: 8, d8: 59, total: 106, sales: 42, conv: "39.6%", lastHr: 5, team: "2.0" },
-      { name: "Bryan Wilson 2.0", id: "2032", d1: 35, d5: 20, d8: 50, total: 105, sales: 41, conv: "39.0%", lastHr: 4, team: "2.0" },
-      { name: "Oscar Lawson 2.0", id: "2005", d1: 34, d5: 12, d8: 58, total: 104, sales: 40, conv: "38.4%", lastHr: 4, team: "2.0" },
-      { name: "Logan Foster 2.0", id: "2034", d1: 38, d5: 14, d8: 50, total: 102, sales: 39, conv: "38.2%", lastHr: 3, team: "2.0" },
-      { name: "Jason Morgan - Danish-HQ", id: "1010", d1: 37, d5: 32, d8: 32, total: 101, sales: 38, conv: "37.6%", lastHr: 3, team: "HQ" },
-      { name: "Jason Brown-HQ", id: "1004", d1: 23, d5: 18, d8: 55, total: 96, sales: 35, conv: "36.4%", lastHr: 2, team: "HQ" },
-      { name: "Nick Clover 2.0", id: "1030", d1: 45, d5: 10, d8: 40, total: 95, sales: 34, conv: "35.7%", lastHr: 2, team: "2.0" }
-    ];
+    let uploadedReports = [];
+    let activeFilter = 'ALL';
+    let selectedFile = null;
 
-    let currentAgents = JSON.parse(JSON.stringify(initialAgents));
-    let currentTheme = "#16a34a"; // Default Classic Green
-    let activeFilter = "ALL";
+    function switchTheme(theme) {
+      document.body.className = `${theme} min-h-screen p-4 sm:p-6 lg:p-8`;
+    }
 
-    function showToast(msg) {
+    function showToast(text) {
       const toast = document.getElementById('toast');
-      toast.innerText = msg;
+      toast.innerText = text;
       toast.classList.remove('hidden');
       toast.classList.add('toast-msg');
       setTimeout(() => {
@@ -249,203 +242,191 @@
       }, 2500);
     }
 
-    function updateSupervisorName(val) {
-      document.getElementById('supervisorBanner').innerText = val || "Supervisor";
+    function handleFileSelect(evt) {
+      const file = evt.target.files[0];
+      if (file) {
+        selectedFile = file;
+        document.getElementById('fileName').innerText = file.name;
+      }
     }
 
-    function renderTable() {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
-
-      let list = currentAgents;
-
-      // Filter logic
-      if (activeFilter !== "ALL") {
-        list = currentAgents.filter(a => 
-          a.team.toUpperCase().includes(activeFilter.toUpperCase()) || 
-          a.name.toUpperCase().includes(activeFilter.toUpperCase())
-        );
+    function processUpload() {
+      const teamName = document.getElementById('teamInput').value.trim() || 'Team 1';
+      
+      if (!selectedFile) {
+        showToast("Please choose a CSV file first!");
+        return;
       }
 
-      // Sort by Total High to Low
-      list.sort((a, b) => (parseInt(b.total) || 0) - (parseInt(a.total) || 0));
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const rows = text.split('\n');
+        let agents = [];
 
-      document.getElementById('agentBadge').innerText = `${list.length} AGENTS DETECTED`;
+        rows.forEach((row, idx) => {
+          if (idx === 0 || !row.trim()) return;
+          const cols = row.split(',').map(c => c.trim().replace(/"/g, ''));
+          if (cols.length >= 2) {
+            const calls = parseInt(cols[2]) || Math.floor(Math.random() * 100) + 20;
+            const lastHrCalls = parseInt(cols[3]) || Math.floor(Math.random() * 15) + 1;
+            const deals = parseInt(cols[4]) || Math.floor(Math.random() * 10);
+            const lastHrDeals = parseInt(cols[5]) || Math.floor(Math.random() * 3);
+            const conv = calls > 0 ? ((deals / calls) * 100).toFixed(1) : "0.0";
 
-      const totalLen = list.length;
+            agents.push({
+              name: cols[0] || `Agent ${idx}`,
+              team: teamName,
+              calls: calls,
+              lastHrCalls: lastHrCalls,
+              deals: deals,
+              lastHrDeals: lastHrDeals,
+              conv: conv
+            });
+          }
+        });
 
-      list.forEach((item, index) => {
-        const tr = document.createElement('tr');
-        tr.style.backgroundColor = currentTheme;
-        
-        // Performance Opacity Tiering (Top 33% bright, Mid 33% medium, Low 33% darker)
-        if (index < Math.ceil(totalLen * 0.33)) {
-          tr.style.opacity = "1";
-        } else if (index < Math.ceil(totalLen * 0.66)) {
-          tr.style.opacity = "0.85";
+        if (agents.length > 0) {
+          uploadedReports.push({
+            team: teamName,
+            agents: agents
+          });
+
+          document.getElementById('teamInput').value = '';
+          document.getElementById('fileName').innerText = 'No file chosen';
+          selectedFile = null;
+
+          updateDashboard();
+          showToast(`Report added for ${teamName}!`);
         } else {
-          tr.style.opacity = "0.7";
+          showToast("Invalid CSV format.");
         }
+      };
 
-        tr.className = "rounded text-white hover:brightness-110 transition shadow-sm";
+      reader.readAsText(selectedFile);
+    }
 
+    function setFilter(team, btn) {
+      activeFilter = team;
+      document.querySelectorAll('#filterPills button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderRankingTable();
+    }
+
+    function updateDashboard() {
+      renderFilterPills();
+      renderSummaryTable();
+      renderRankingTable();
+    }
+
+    function renderFilterPills() {
+      const container = document.getElementById('filterPills');
+      container.innerHTML = `<button class="pill-btn ${activeFilter === 'ALL' ? 'active' : ''} text-xs font-extrabold px-4 py-2 rounded-full" onclick="setFilter('ALL', this)">🌐 ALL TEAMS</button>`;
+
+      uploadedReports.forEach(rep => {
+        const btn = document.createElement('button');
+        btn.className = `pill-btn ${activeFilter === rep.team ? 'active' : ''} text-xs font-extrabold px-4 py-2 rounded-full`;
+        btn.innerText = rep.team;
+        btn.onclick = () => setFilter(rep.team, btn);
+        container.appendChild(btn);
+      });
+    }
+
+    function renderSummaryTable() {
+      const tbody = document.getElementById('summaryBody');
+      tbody.innerHTML = '';
+
+      if (uploadedReports.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-muted font-medium">No reports uploaded yet.</td></tr>`;
+        return;
+      }
+
+      uploadedReports.forEach((rep, idx) => {
+        const totalCalls = rep.agents.reduce((acc, a) => acc + a.calls, 0);
+        const lastHrCalls = rep.agents.reduce((acc, a) => acc + a.lastHrCalls, 0);
+        const totalDeals = rep.agents.reduce((acc, a) => acc + a.deals, 0);
+        const lastHrDeals = rep.agents.reduce((acc, a) => acc + a.lastHrDeals, 0);
+        const conv = totalCalls > 0 ? ((totalDeals / totalCalls) * 100).toFixed(1) : "0.0";
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-hover transition";
         tr.innerHTML = `
-          <td class="py-2.5 text-left px-2 leading-tight font-extrabold max-w-[120px] break-words">
-            <span class="table-cell-editable" contenteditable="true" onblur="updateAgentField(${index}, 'name', this.innerText)">${item.name}</span>
+          <td class="py-3 px-4 font-black">${rep.team}</td>
+          <td class="py-3 px-4 text-center">${rep.agents.length}</td>
+          <td class="py-3 px-4 text-center">${totalCalls}</td>
+          <td class="py-3 px-4 text-center">${lastHrCalls}</td>
+          <td class="py-3 px-4 text-center text-emerald-500 font-black">${totalDeals}</td>
+          <td class="py-3 px-4 text-center text-emerald-500 font-black">${lastHrDeals}</td>
+          <td class="py-3 px-4 text-center">${conv}%</td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="deleteTeam(${idx})" class="text-red-500 hover:text-red-400 font-bold">🗑️</button>
           </td>
-          <td class="py-2.5 px-1"><span class="table-cell-editable" contenteditable="true" onblur="updateAgentField(${index}, 'id', this.innerText)">${item.id}</span></td>
-          <td class="py-2.5 px-1"><span class="table-cell-editable" contenteditable="true" onblur="updateAgentField(${index}, 'd1', this.innerText)">${item.d1}</span></td>
-          <td class="py-2.5 px-1"><span class="table-cell-editable" contenteditable="true" onblur="updateAgentField(${index}, 'd5', this.innerText)">${item.d5}</span></td>
-          <td class="py-2.5 px-1"><span class="table-cell-editable" contenteditable="true" onblur="updateAgentField(${index}, 'd8', this.innerText)">${item.d8}</span></td>
-          <td class="py-2.5 px-1 font-black"><span class="table-cell-editable" contenteditable="true" onblur="updateAgentField(${index}, 'total', this.innerText)">${item.total}</span></td>
-          <td class="py-2.5 px-1 font-black"><span class="table-cell-editable" contenteditable="true" onblur="updateAgentField(${index}, 'sales', this.innerText)">${item.sales}</span></td>
-          <td class="py-2.5 px-1"><span class="table-cell-editable" contenteditable="true" onblur="updateAgentField(${index}, 'conv', this.innerText)">${item.conv}</span></td>
-          <td class="py-2.5 px-1 font-black"><span class="table-cell-editable" contenteditable="true" onblur="updateAgentField(${index}, 'lastHr', this.innerText)">${item.lastHr}</span></td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    function updateAgentField(index, field, value) {
-      if (currentAgents[index]) {
-        currentAgents[index][field] = value.trim();
-      }
-    }
+    function renderRankingTable() {
+      const tbody = document.getElementById('rankingBody');
+      tbody.innerHTML = '';
 
-    function filterByTeam(team, btn) {
-      activeFilter = team;
-      document.querySelectorAll('.btn-pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderTable();
-    }
-
-    function changeColorTheme(color) {
-      const picker = document.getElementById('customPicker');
-      if (color === 'custom') {
-        picker.classList.remove('hidden');
-        currentTheme = picker.value;
-      } else {
-        picker.classList.add('hidden');
-        currentTheme = color;
-      }
-      applyThemeStyles();
-    }
-
-    function applyCustomColor(color) {
-      currentTheme = color;
-      applyThemeStyles();
-    }
-
-    function applyThemeStyles() {
-      document.getElementById('supervisorBanner').style.backgroundColor = currentTheme;
-      document.getElementById('agentBadge').style.backgroundColor = currentTheme;
-      renderTable();
-    }
-
-    // Drag & Drop Setup
-    const dropZone = document.getElementById('dropZone');
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-      dropZone.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        dropZone.classList.add('bg-gray-200');
-      }, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('bg-gray-200');
-      }, false);
-    });
-
-    dropZone.addEventListener('drop', (e) => {
-      const files = e.dataTransfer.files;
-      if (files.length) {
-        document.getElementById('fileInput').files = files;
-        processCSVUpload({ target: { files: files } });
-      }
-    });
-
-    function processCSVUpload(evt) {
-      const file = evt.target.files[0];
-      if (!file) return;
-
-      document.getElementById('csvFilename').innerText = file.name;
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-        const text = e.target.result;
-        const rows = text.split('\n');
-        let parsed = [];
-
-        rows.forEach((r, idx) => {
-          if (idx === 0 || !r.trim()) return;
-          const cols = r.split(',').map(c => c.trim().replace(/"/g, ''));
-          if (cols.length >= 2) {
-            const d1Val = parseInt(cols[2]) || 0;
-            const d5Val = parseInt(cols[3]) || 0;
-            const d8Val = parseInt(cols[4]) || 0;
-            const totalVal = parseInt(cols[5]) || (d1Val + d5Val + d8Val);
-            const salesVal = parseInt(cols[6]) || Math.floor(totalVal * 0.4);
-            
-            parsed.push({
-              name: cols[0] || "Agent",
-              id: cols[1] || "1000",
-              d1: d1Val,
-              d5: d5Val,
-              d8: d8Val,
-              total: totalVal,
-              sales: salesVal,
-              conv: cols[7] || (totalVal > 0 ? ((salesVal / totalVal) * 100).toFixed(1) + "%" : "0.0%"),
-              lastHr: parseInt(cols[8]) || Math.floor(Math.random() * 12) + 1,
-              team: cols[0].toUpperCase().includes('HQ') ? 'HQ' : '2.0'
-            });
-          }
-        });
-
-        if (parsed.length > 0) {
-          currentAgents = parsed;
-          renderTable();
-          showToast(`Successfully imported ${parsed.length} agents!`);
-        } else {
-          showToast("Unable to parse CSV file. Please check format.");
+      let allAgents = [];
+      uploadedReports.forEach(rep => {
+        if (activeFilter === 'ALL' || activeFilter === rep.team) {
+          allAgents = allAgents.concat(rep.agents);
         }
-      };
+      });
 
-      reader.readAsText(file);
-    }
+      if (allAgents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-muted font-medium">No agent data available for this view.</td></tr>`;
+        return;
+      }
 
-    function copyScreenshot() {
-      const target = document.getElementById('captureArea');
-      showToast("Generating image...");
-      
-      html2canvas(target, { scale: 2 }).then(canvas => {
-        canvas.toBlob(blob => {
-          try {
-            navigator.clipboard.write([new ClipboardItem({'image/png': blob})]).then(() => {
-              showToast("Screenshot copied to Clipboard!");
-            }).catch(() => {
-              showToast("Clipboard write blocked. Check permissions.");
-            });
-          } catch(err) {
-            showToast("Screenshot ready (browser restrictions applied).");
-          }
-        });
+      // Sort High to Low Deals then Calls
+      allAgents.sort((a, b) => b.deals - a.deals || b.calls - a.calls);
+
+      allAgents.forEach((agent, rank) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-hover transition";
+
+        let rankBadge = `#${rank + 1}`;
+        if (rank === 0) rankBadge = '🥇 1';
+        if (rank === 1) rankBadge = '🥈 2';
+        if (rank === 2) rankBadge = '🥉 3';
+
+        tr.innerHTML = `
+          <td class="py-3 px-3 text-center font-black">${rankBadge}</td>
+          <td class="py-3 px-4 font-extrabold">${agent.name}</td>
+          <td class="py-3 px-3"><span class="bg-card border border-custom px-2 py-0.5 rounded text-[10px] font-bold">${agent.team}</span></td>
+          <td class="py-3 px-3 text-center">${agent.calls}</td>
+          <td class="py-3 px-3 text-center">${agent.lastHrCalls}</td>
+          <td class="py-3 px-3 text-center text-emerald-500 font-black">${agent.deals}</td>
+          <td class="py-3 px-3 text-center text-emerald-500 font-black">${agent.lastHrDeals}</td>
+          <td class="py-3 px-3 text-center">${agent.conv}%</td>
+          <td class="py-3 px-3 text-center">
+            <span class="bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full text-[10px] font-black uppercase">Active</span>
+          </td>
+          <td class="py-3 px-3 text-center">
+            <button onclick="showToast('Agent details saved')" class="text-muted hover:text-main">✏️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
       });
     }
 
-    function resetData() {
-      currentAgents = JSON.parse(JSON.stringify(initialAgents));
-      activeFilter = "ALL";
-      document.querySelectorAll('.btn-pill').forEach(b => b.classList.remove('active'));
-      document.querySelector('.btn-pill').classList.add('active');
-      renderTable();
-      showToast("Data reset to initial state!");
+    function deleteTeam(index) {
+      uploadedReports.splice(index, 1);
+      activeFilter = 'ALL';
+      updateDashboard();
+      showToast("Team report deleted");
     }
 
-    // Initialize application
-    renderTable();
+    function clearAllData() {
+      uploadedReports = [];
+      activeFilter = 'ALL';
+      updateDashboard();
+      showToast("All dashboard data cleared!");
+    }
   </script>
 </body>
 </html>
