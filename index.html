@@ -15,31 +15,31 @@
         }
 
         body {
-            background-color: #ffffff;
+            background-color: #f4f6f8;
             color: #000000;
-            padding: 30px 15px;
+            padding: 25px 15px;
             display: flex;
             justify-content: center;
         }
 
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1100px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
         }
 
         /* Title Header */
         .title-header h1 {
-            font-size: 38px;
+            font-size: 34px;
             font-weight: 900;
             letter-spacing: -1px;
             line-height: 1.1;
         }
 
         .title-header p {
-            font-size: 16px;
+            font-size: 15px;
             color: #4b5563;
             margin-top: 4px;
             font-weight: 500;
@@ -53,9 +53,9 @@
 
         .input-box, .select-box {
             border: 2px solid #000000;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 10px 16px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
             outline: none;
             background: white;
@@ -75,7 +75,7 @@
             padding-right: 36px;
         }
 
-        /* Buttons Row 2 */
+        /* Controls Row 2 */
         .control-row-2 {
             display: flex;
             gap: 12px;
@@ -85,9 +85,9 @@
             background-color: #000000;
             color: #ffffff;
             border: none;
-            border-radius: 12px;
-            padding: 10px 24px;
-            font-size: 16px;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-size: 15px;
             font-weight: 800;
             cursor: pointer;
             transition: opacity 0.2s;
@@ -100,10 +100,10 @@
         /* Dotted Upload Box */
         .upload-box {
             border: 2px dashed #000000;
-            border-radius: 12px;
-            padding: 18px;
+            border-radius: 10px;
+            padding: 16px;
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 800;
             cursor: pointer;
             display: flex;
@@ -120,19 +120,19 @@
         /* Teams Container */
         .teams-container {
             border: 2px solid #000000;
-            border-radius: 20px;
-            padding: 14px 16px;
+            border-radius: 16px;
+            padding: 12px 14px;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px 10px;
+            gap: 8px;
             background-color: #ffffff;
         }
 
         .team-pill {
             border: 2px solid #000000;
-            border-radius: 25px;
-            padding: 6px 18px;
-            font-size: 15px;
+            border-radius: 20px;
+            padding: 5px 16px;
+            font-size: 14px;
             font-weight: 800;
             background: white;
             color: black;
@@ -145,13 +145,14 @@
             color: white;
         }
 
-        /* Main Card Table Area */
+        /* Card Container */
         .card-container {
-            background-color: #000000;
-            border-radius: 24px;
-            padding: 20px;
-            color: white;
+            background-color: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 12px;
+            padding: 16px;
             overflow-x: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .card-header-top {
@@ -159,149 +160,152 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
-            padding: 0 4px;
         }
 
         .filename-text {
             font-size: 12px;
             font-weight: 800;
-            letter-spacing: 0.5px;
-            color: #ffffff;
+            color: #333333;
             font-family: monospace;
         }
 
         .badge-agents {
-            background-color: #00a86b;
-            color: #000000;
-            font-size: 13px;
+            background-color: #000000;
+            color: #ffffff;
+            font-size: 12px;
             font-weight: 900;
             padding: 6px 14px;
-            border-radius: 16px;
-            letter-spacing: 0.5px;
+            border-radius: 12px;
         }
 
-        /* Big Title Banner inside Card */
         .manager-title-banner {
-            background-color: #00a86b;
+            background-color: #000000;
             color: #ffffff;
-            font-size: 32px;
+            font-size: 26px;
             font-weight: 900;
             text-align: center;
-            padding: 12px;
-            border-radius: 14px;
-            margin-bottom: 18px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 14px;
             letter-spacing: 0.5px;
         }
 
-        /* Excel-Like Table Design */
+        /* Excel Exact Matching Table Design */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
         }
 
-        .reporter-table {
+        .excel-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-            min-width: 650px;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 800px;
+            background-color: #ffffff;
         }
 
-        .reporter-table th {
-            color: #ffffff;
-            font-size: 13px;
+        /* Header Styling */
+        .excel-table th {
+            background-color: #a8b3c1;
+            color: #000000;
             font-weight: 900;
             text-align: center;
-            padding: 8px 12px;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
+            padding: 10px 8px;
+            border: 1px solid #7f8c8d;
+            font-size: 14px;
+            letter-spacing: 0.3px;
         }
 
-        .reporter-table th:first-child {
+        .excel-table th:first-child {
             text-align: left;
-            padding-left: 16px;
-            min-width: 180px;
+            padding-left: 14px;
+            min-width: 220px;
         }
 
-        /* Row Color Tiers */
-        .reporter-table tbody tr.tier-top {
-            background-color: #00a86b !important; /* Green for Top Performers */
-            color: #ffffff;
+        /* Summary Row (Top Totals Row) */
+        .summary-row td {
+            background-color: #d1d8e0;
+            color: #000000;
+            font-weight: 900;
+            font-size: 15px;
+            text-align: center;
+            padding: 10px 8px;
+            border: 1px solid #7f8c8d;
         }
 
-        .reporter-table tbody tr.tier-mid {
-            background-color: #e6a100 !important; /* Orange/Yellow for Mid Performers */
-            color: #ffffff;
+        .summary-row td.total-grand-cell {
+            background-color: #00a86b !important; /* Green total highlight */
+            color: #ffffff !important;
+            font-size: 16px;
         }
 
-        .reporter-table tbody tr.tier-low {
-            background-color: #d93838 !important; /* Red for Low Performers */
-            color: #ffffff;
+        /* Data Body Rows */
+        .excel-table tbody tr {
+            border-bottom: 1px solid #d1d8e0;
         }
 
-        .reporter-table td {
-            padding: 12px 10px;
+        .excel-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .excel-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .excel-table td {
+            padding: 8px;
             text-align: center;
             font-weight: 800;
-            font-size: 15px;
-            white-space: nowrap;
+            color: #000000;
+            border: 1px solid #d1d8e0;
             outline: none;
         }
 
-        .reporter-table td[contenteditable="true"]:hover {
-            outline: 2px dashed #ffffff;
+        .excel-table td[contenteditable="true"]:hover {
+            background-color: #e2e8f0;
             cursor: text;
         }
 
-        .reporter-table td:first-child {
-            border-top-left-radius: 10px;
-            border-bottom-left-radius: 10px;
+        .excel-table td:first-child {
             text-align: left;
-            padding-left: 16px;
+            padding-left: 14px;
+            font-weight: 800;
         }
 
-        .reporter-table td:last-child {
-            border-top-right-radius: 10px;
-            border-bottom-right-radius: 10px;
-        }
-
-        .conv-val {
+        /* Last Column Red Cell Highlight */
+        .excel-table td.total-col-cell {
+            background-color: #d93838 !important; /* Red for Total Column */
+            color: #ffffff !important;
             font-weight: 900;
+            font-size: 15px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Header -->
     <div class="title-header">
         <h1>Performance Reporter</h1>
         <p>Automated Vicidialer Transformation</p>
     </div>
 
-    <!-- Controls Row 1 -->
     <div class="control-row-1">
-        <input type="text" id="managerInput" class="input-box" value="Qaiser Khan" placeholder="Manager / Leader Name">
-        <select id="themeSelect" class="select-box" onchange="applyColorTiering()">
-            <option value="auto">🚦 Performance Tiers (Green/Yellow/Red)</option>
-            <option value="#00a86b">🟢 All Green</option>
-            <option value="#007bff">🔵 All Blue</option>
-            <option value="#6f42c1">🟣 All Purple</option>
+        <input type="text" id="managerInput" class="input-box" value="Qaiser Khan" placeholder="Manager Name">
+        <select id="themeSelect" class="select-box">
+            <option value="default">📊 Excel Standard Theme</option>
         </select>
     </div>
 
-    <!-- Controls Row 2 -->
     <div class="control-row-2">
         <button class="btn-black" onclick="resetData()">Reset</button>
         <button class="btn-black" onclick="copyScreenshot()">Copy Screenshot</button>
     </div>
 
-    <!-- File Upload Box -->
     <div class="upload-box" onclick="document.getElementById('csvFileInput').click()">
-        📄 📑 <span>Upload / Drag & Drop Vicidialer CSV File</span>
+        📄 <span>Upload / Drag & Drop Vicidialer CSV File</span>
         <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileUpload(event)">
     </div>
 
-    <!-- Team Filters -->
     <div class="teams-container" id="teamsFilterContainer">
         <button class="team-pill active" onclick="filterTeam('All Teams', this)">All Teams</button>
         <button class="team-pill" onclick="filterTeam('OTHER', this)">OTHER</button>
@@ -315,11 +319,10 @@
         <button class="team-pill" onclick="filterTeam('3.1', this)">3.1</button>
     </div>
 
-    <!-- Report Card Container -->
     <div class="card-container" id="captureCard">
         <div class="card-header-top">
             <span class="filename-text" id="filenameDisplay">AGENT_PERFORMACE_DETAIL20261001-104413.csv</span>
-            <span class="badge-agents" id="agentCountBadge">5 AGENTS DETECTED</span>
+            <span class="badge-agents" id="agentCountBadge">26 AGENTS DETECTED</span>
         </div>
 
         <div class="manager-title-banner" id="cardManagerTitle">
@@ -327,21 +330,22 @@
         </div>
 
         <div class="table-responsive">
-            <table class="reporter-table">
+            <table class="excel-table">
                 <thead>
                     <tr id="tableHeaderRow">
-                        <th>USER</th>
+                        <th>USER NAME</th>
                         <th>ID</th>
-                        <th>TOTAL CALLS</th>
                         <th>D1</th>
                         <th>D5</th>
+                        <th>D6</th>
                         <th>D8</th>
-                        <th>TOTAL SALES</th>
-                        <th>CONV %</th>
+                        <th>D8INT</th>
+                        <th>D9</th>
+                        <th>TOTAL</th>
                     </tr>
                 </thead>
                 <tbody id="agentTableBody">
-                    <!-- Sample Data matching requested structure -->
+                    <!-- Dynamic Rows Generated via JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -349,113 +353,128 @@
 </div>
 
 <script>
+    // Initial Sample Data structured exactly like image
     let rawAgentsData = [
-        { name: "Michael Tolliver-HQ", id: "1001", totalCalls: 184, d1: 69, d5: 38, d8: 77, d9: 0, sales: 82, conv: "44.5%" },
-        { name: "Danny Parker 2.0", id: "2018", totalCalls: 177, d1: 79, d5: 23, d8: 75, d9: 0, sales: 79, conv: "44.6%" },
-        { name: "Dan Muccray-HQ", id: "1016", totalCalls: 169, d1: 59, d5: 46, d8: 64, d9: 0, sales: 71, conv: "42.0%" },
-        { name: "Jordan Ford-HQ", id: "1002", totalCalls: 145, d1: 58, d5: 22, d8: 65, d9: 0, sales: 64, conv: "44.1%" },
-        { name: "Bryan Grayson 2.1", id: "2004", totalCalls: 125, d1: 53, d5: 14, d8: 58, d9: 0, sales: 55, conv: "44.0%" }
+        { name: "Michael Tolliver-HQ", id: "1001", d1: 69, d5: 38, d6: 0, d8: 77, d8int: 1, d9: 0, total: 185 },
+        { name: "Danny Parker 2.0", id: "2018", d1: 79, d5: 23, d6: 0, d8: 75, d8int: 0, d9: 0, total: 177 },
+        { name: "Dan Muccray-HQ", id: "1016", d1: 59, d5: 46, d6: 0, d8: 64, d8int: 0, d9: 0, total: 169 },
+        { name: "Jordan Ford-HQ", id: "1002", d1: 58, d5: 22, d6: 0, d8: 65, d8int: 0, d9: 0, total: 145 },
+        { name: "Bryan Grayson 2.0", id: "2004", d1: 53, d5: 14, d6: 0, d8: 58, d8int: 0, d9: 0, total: 125 },
+        { name: "Mike James-HQ", id: "1003", d1: 32, d5: 14, d6: 0, d8: 71, d8int: 0, d9: 0, total: 117 },
+        { name: "Steve Henley-HQ", id: "1024", d1: 17, d5: 41, d6: 0, d8: 56, d8int: 0, d9: 0, total: 114 },
+        { name: "David Gibson 2.0", id: "2014", d1: 58, d5: 14, d6: 0, d8: 38, d8int: 0, d9: 0, total: 110 },
+        { name: "Lewis Cooper 2.0", id: "2010", d1: 39, d5: 8, d6: 0, d8: 59, d8int: 0, d9: 0, total: 106 },
+        { name: "Bryan Wilson 2.0", id: "2032", d1: 35, d5: 20, d6: 0, d8: 50, d8int: 0, d9: 0, total: 105 },
+        { name: "Oscar Lawson 2.0", id: "2005", d1: 34, d5: 12, d6: 0, d8: 58, d8int: 0, d9: 0, total: 104 },
+        { name: "Logan Foster 2.0", id: "2034", d1: 38, d5: 14, d6: 0, d8: 50, d8int: 0, d9: 0, total: 102 },
+        { name: "Jason Morgan - Danish...", id: "1010", d1: 37, d5: 32, d6: 0, d8: 32, d8int: 0, d9: 0, total: 101 },
+        { name: "Jason Brown-HQ", id: "1004", d1: 23, d5: 18, d6: 0, d8: 55, d8int: 0, d9: 0, total: 96 },
+        { name: "Nick Clover 2.0", id: "1030", d1: 45, d5: 10, d6: 0, d8: 40, d8int: 1, d9: 0, total: 96 },
+        { name: "Erica Adams-HQ", id: "1011", d1: 20, d5: 10, d6: 0, d8: 54, d8int: 0, d9: 0, total: 84 },
+        { name: "Zack Murphy 2.0", id: "2015", d1: 26, d5: 4, d6: 0, d8: 53, d8int: 0, d9: 0, total: 83 },
+        { name: "Brad Miller 2.0 Aliyan", id: "2008", d1: 41, d5: 8, d6: 0, d8: 33, d8int: 0, d9: 0, total: 82 },
+        { name: "Nick Clover - HQ", id: "1019", d1: 21, d5: 6, d6: 0, d8: 53, d8int: 0, d9: 0, total: 80 },
+        { name: "Terry Brown -HQ", id: "1017", d1: 22, d5: 3, d6: 0, d8: 54, d8int: 0, d9: 0, total: 79 },
+        { name: "Jay Robbins 2.0", id: "2031", d1: 12, d5: 14, d6: 0, d8: 50, d8int: 2, d9: 0, total: 78 },
+        { name: "Jacob Brown - HQ", id: "1027", d1: 15, d5: 15, d6: 0, d8: 44, d8int: 1, d9: 0, total: 75 },
+        { name: "Jasper hale 2.0", id: "2006", d1: 31, d5: 2, d6: 0, d8: 42, d8int: 0, d9: 0, total: 75 },
+        { name: "Adam Brown -HQ", id: "1025", d1: 19, d5: 9, d6: 0, d8: 46, d8int: 0, d9: 0, total: 74 },
+        { name: "Henry 2.1", id: "2020", d1: 27, d5: 7, d6: 0, d8: 39, d8int: 0, d9: 1, total: 74 },
+        { name: "Lisa Smith 2.0", id: "2029", d1: 16, d5: 9, d6: 0, d8: 48, d8int: 0, d9: 0, total: 73 },
+        { name: "Alex -HQ", id: "1021", d1: 17, d5: 14, d6: 0, d8: 40, d8int: 0, d9: 0, total: 71 }
     ];
 
     let currentSelectedTeam = "All Teams";
 
-    // Manager Title Sync
     const managerInput = document.getElementById('managerInput');
     const cardManagerTitle = document.getElementById('cardManagerTitle');
     managerInput.addEventListener('input', function() {
         cardManagerTitle.innerText = this.value || 'Manager Name';
     });
 
-    // Initial Render
     renderDashboard();
 
     function renderDashboard() {
-        // 1. Filter Agents by Selected Team
         let filtered = rawAgentsData.filter(agent => {
             if (currentSelectedTeam === "All Teams") return true;
             return agent.name.toLowerCase().includes(currentSelectedTeam.toLowerCase());
         });
 
-        // 2. Sort High to Low Performance (by Total Calls/Sales)
-        filtered.sort((a, b) => b.totalCalls - a.totalCalls);
+        // Sort Highest to Lowest
+        filtered.sort((a, b) => b.total - a.total);
 
-        // 3. Find Dynamic Dispositions (D1 to D9) where sales/activity > 0
-        let activeDispositions = [];
-        for (let i = 1; i <= 9; i++) {
-            let key = 'd' + i;
-            let hasValue = filtered.some(a => a[key] && Number(a[key]) > 0);
-            if (hasValue) {
-                activeDispositions.push(i);
-            }
-        }
+        // Dispositions Keys List
+        let dispKeys = ["d1", "d5", "d6", "d8", "d8int", "d9"];
 
-        // 4. Build Table Header
-        let headerHTML = `<th>USER</th><th>ID</th><th>TOTAL CALLS</th>`;
-        activeDispositions.forEach(dNum => {
-            headerHTML += `<th>D${dNum}</th>`;
+        // Calculate Totals for Top Summary Row
+        let totals = { d1: 0, d5: 0, d6: 0, d8: 0, d8int: 0, d9: 0, grandTotal: 0 };
+        filtered.forEach(agent => {
+            dispKeys.forEach(k => {
+                totals[k] += (Number(agent[k]) || 0);
+            });
+            totals.grandTotal += (Number(agent.total) || 0);
         });
-        headerHTML += `<th>TOTAL SALES</th><th>CONV %</th>`;
+
+        // 1. Render Table Header
+        let headerHTML = `
+            <th>USER NAME</th>
+            <th>ID</th>
+            <th>D1</th>
+            <th>D5</th>
+            <th>D6</th>
+            <th>D8</th>
+            <th>D8INT</th>
+            <th>D9</th>
+            <th>TOTAL</th>
+        `;
         document.getElementById('tableHeaderRow').innerHTML = headerHTML;
 
-        // 5. Build Table Rows with Performance Tiers
+        // 2. Render Table Body
         let tbody = document.getElementById('agentTableBody');
         tbody.innerHTML = '';
 
+        // Add Top Summary Row
+        let summaryRow = document.createElement('tr');
+        summaryRow.className = 'summary-row';
+        summaryRow.innerHTML = `
+            <td></td>
+            <td></td>
+            <td contenteditable="true">${totals.d1}</td>
+            <td contenteditable="true">${totals.d5}</td>
+            <td contenteditable="true">${totals.d6}</td>
+            <td contenteditable="true">${totals.d8}</td>
+            <td contenteditable="true">${totals.d8int}</td>
+            <td contenteditable="true">${totals.d9}</td>
+            <td contenteditable="true" class="total-grand-cell">${totals.grandTotal}</td>
+        `;
+        tbody.appendChild(summaryRow);
+
+        // Add Agent Rows
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 20px;">No agents found for team ${currentSelectedTeam}</td></tr>`;
+            let emptyTr = document.createElement('tr');
+            emptyTr.innerHTML = `<td colspan="9" style="text-align:center; padding: 20px;">No agents found for ${currentSelectedTeam}</td>`;
+            tbody.appendChild(emptyTr);
             document.getElementById('agentCountBadge').innerText = `0 AGENTS DETECTED`;
             return;
         }
 
-        let maxCalls = Math.max(...filtered.map(a => a.totalCalls || 0));
-
-        filtered.forEach((agent, index) => {
+        filtered.forEach(agent => {
             let tr = document.createElement('tr');
-            
-            // Assign Tier Class (Green for Top, Yellow for Mid, Red for Low)
-            let tierClass = 'tier-top';
-            if (index >= Math.ceil(filtered.length * 0.7)) {
-                tierClass = 'tier-low';
-            } else if (index >= Math.ceil(filtered.length * 0.3)) {
-                tierClass = 'tier-mid';
-            }
-            tr.className = tierClass;
-
-            let rowContent = `
+            tr.innerHTML = `
                 <td contenteditable="true">${agent.name}</td>
                 <td contenteditable="true">${agent.id}</td>
-                <td contenteditable="true">${agent.totalCalls}</td>
+                <td contenteditable="true">${agent.d1 || 0}</td>
+                <td contenteditable="true">${agent.d5 || 0}</td>
+                <td contenteditable="true">${agent.d6 || 0}</td>
+                <td contenteditable="true">${agent.d8 || 0}</td>
+                <td contenteditable="true">${agent.d8int || 0}</td>
+                <td contenteditable="true">${agent.d9 || 0}</td>
+                <td contenteditable="true" class="total-col-cell">${agent.total || 0}</td>
             `;
-
-            activeDispositions.forEach(dNum => {
-                let key = 'd' + dNum;
-                rowContent += `<td contenteditable="true">${agent[key] || 0}</td>`;
-            });
-
-            rowContent += `
-                <td contenteditable="true">${agent.sales}</td>
-                <td contenteditable="true" class="conv-val">${agent.conv}</td>
-            `;
-
-            tr.innerHTML = rowContent;
             tbody.appendChild(tr);
         });
 
         document.getElementById('agentCountBadge').innerText = `${filtered.length} AGENTS DETECTED`;
-        applyColorTiering();
-    }
-
-    function applyColorTiering() {
-        let theme = document.getElementById('themeSelect').value;
-        let rows = document.querySelectorAll('#agentTableBody tr');
-        
-        rows.forEach(tr => {
-            if (theme === 'auto') {
-                tr.style.backgroundColor = '';
-            } else {
-                tr.style.backgroundColor = theme;
-            }
-        });
     }
 
     function filterTeam(teamName, btn) {
@@ -492,7 +511,6 @@
         });
     }
 
-    // CSV Reader
     function handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -515,16 +533,24 @@
         for (let i = 1; i < lines.length; i++) {
             const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
             if (cols.length >= 8) {
+                let d1Val = parseInt(cols[2]) || 0;
+                let d5Val = parseInt(cols[3]) || 0;
+                let d6Val = parseInt(cols[4]) || 0;
+                let d8Val = parseInt(cols[5]) || 0;
+                let d8intVal = parseInt(cols[6]) || 0;
+                let d9Val = parseInt(cols[7]) || 0;
+                let totVal = d1Val + d5Val + d6Val + d8Val + d8intVal + d9Val;
+
                 rawAgentsData.push({
                     name: cols[0] || 'Agent',
                     id: cols[1] || '-',
-                    totalCalls: parseInt(cols[5]) || parseInt(cols[2]) || 0,
-                    d1: parseInt(cols[2]) || 0,
-                    d5: parseInt(cols[3]) || 0,
-                    d8: parseInt(cols[4]) || 0,
-                    d9: parseInt(cols[9]) || 0,
-                    sales: parseInt(cols[6]) || 0,
-                    conv: cols[7] || '0%'
+                    d1: d1Val,
+                    d5: d5Val,
+                    d6: d6Val,
+                    d8: d8Val,
+                    d8int: d8intVal,
+                    d9: d9Val,
+                    total: totVal
                 });
             }
         }
