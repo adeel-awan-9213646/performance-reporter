@@ -1,432 +1,488 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vicidial Multi-Team Dashboard</title>
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- html2canvas for taking screenshots -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Reporter</title>
+    <!-- html2canvas for Screenshot button -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-  <style>
-    /* Theme Definitions */
-    .theme-dark {
-      --bg-main: #09090b;
-      --bg-card: #18181b;
-      --bg-hover: #27272a;
-      --text-main: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --border-color: #27272a;
-      --accent: #3b82f6;
-    }
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
 
-    .theme-light {
-      --bg-main: #f8fafc;
-      --bg-card: #ffffff;
-      --bg-hover: #f1f5f9;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
-      --accent: #2563eb;
-    }
+        .container {
+            width: 100%;
+            max-width: 750px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
 
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
+        /* Title Header */
+        .title-header h1 {
+            font-size: 38px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
 
-    .card {
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-    }
+        .title-header p {
+            font-size: 16px;
+            color: #4b5563;
+            margin-top: 4px;
+            font-weight: 500;
+        }
 
-    .border-custom {
-      border-color: var(--border-color);
-    }
+        /* Controls Row 1 */
+        .control-row-1 {
+            display: flex;
+            gap: 12px;
+        }
 
-    .table-header {
-      background-color: var(--bg-hover);
-      color: var(--text-muted);
-    }
+        .input-box, .select-box {
+            border: 2px solid #000000;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 18px;
+            font-weight: 800;
+            outline: none;
+            background: white;
+        }
 
-    .pill-btn {
-      border: 1px solid var(--border-color);
-      background-color: var(--bg-card);
-      color: var(--text-main);
-      transition: all 0.15s ease;
-    }
+        .input-box {
+            flex: 1;
+        }
 
-    .pill-btn:hover {
-      background-color: var(--bg-hover);
-    }
+        .select-box {
+            flex: 1;
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
 
-    .pill-btn.active {
-      background-color: var(--text-main);
-      color: var(--bg-main);
-      border-color: var(--text-main);
-    }
+        /* Buttons Row 2 */
+        .control-row-2 {
+            display: flex;
+            gap: 12px;
+        }
 
-    .toast-msg {
-      animation: fadeInOut 2.5s forwards;
-    }
+        .btn-black {
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
 
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translateY(20px); }
-      15% { opacity: 1; transform: translateY(0); }
-      85% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(20px); }
-    }
-  </style>
+        .btn-black:hover {
+            opacity: 0.85;
+        }
+
+        /* Dotted Upload Box */
+        .upload-box {
+            border: 2px dashed #000000;
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #ffffff;
+        }
+
+        .upload-box input {
+            display: none;
+        }
+
+        /* Teams Container */
+        .teams-container {
+            border: 2px solid #000000;
+            border-radius: 20px;
+            padding: 14px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 10px;
+            background-color: #ffffff;
+        }
+
+        .team-pill {
+            border: 2px solid #000000;
+            border-radius: 25px;
+            padding: 6px 18px;
+            font-size: 15px;
+            font-weight: 800;
+            background: white;
+            color: black;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .team-pill.active {
+            background: black;
+            color: white;
+        }
+
+        /* Main Card Table Area */
+        .card-container {
+            background-color: #000000;
+            border-radius: 24px;
+            padding: 16px;
+            color: white;
+            overflow: hidden;
+        }
+
+        .card-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+
+        .filename-text {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            font-family: monospace;
+        }
+
+        .badge-agents {
+            background-color: #00a86b;
+            color: #000000;
+            font-size: 13px;
+            font-weight: 900;
+            padding: 6px 14px;
+            border-radius: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Big Title Banner inside Card */
+        .manager-title-banner {
+            background-color: #00a86b;
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 900;
+            text-align: center;
+            padding: 10px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Table Design */
+        .reporter-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 6px;
+        }
+
+        .reporter-table th {
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 900;
+            text-align: center;
+            padding: 6px 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .reporter-table th:first-child {
+            text-align: left;
+            padding-left: 12px;
+        }
+
+        .reporter-table tbody tr {
+            background-color: #00a86b;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .reporter-table td {
+            padding: 10px 4px;
+            text-align: center;
+        }
+
+        .reporter-table td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            text-align: left;
+            padding-left: 12px;
+            line-height: 1.2;
+            max-width: 160px;
+            word-break: break-word;
+        }
+
+        .reporter-table td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .conv-val {
+            font-weight: 900;
+        }
+    </style>
 </head>
-<body class="theme-dark min-h-screen p-4 sm:p-6 lg:p-8">
+<body>
 
-  <div class="max-w-7xl mx-auto space-y-6">
+<div class="container">
+    <!-- Header -->
+    <div class="title-header">
+        <h1>Performance Reporter</h1>
+        <p>Automated Vicidialer Transformation</p>
+    </div>
 
-    <!-- Top Navigation Header -->
-    <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-custom">
-      <div class="flex items-center gap-3">
-        <span class="text-3xl">🚀</span>
-        <h1 class="text-2xl sm:text-3xl font-black tracking-tight">Vicidial Multi-Team Dashboard</h1>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <label class="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
-          🎨 Theme:
-        </label>
-        <select 
-          id="themeSelect" 
-          onchange="switchTheme(this.value)" 
-          class="bg-card border border-custom text-sm font-bold rounded-lg px-3 py-1.5 outline-none cursor-pointer"
-        >
-          <option value="theme-dark">Midnight Dark</option>
-          <option value="theme-light">Clean Light</option>
+    <!-- Controls Row 1 -->
+    <div class="control-row-1">
+        <input type="text" id="managerInput" class="input-box" value="Qaiser Khan" placeholder="Manager / Leader Name">
+        <select id="themeSelect" class="select-box" onchange="changeTheme(this.value)">
+            <option value="#00a86b">🟢 Classic Green</option>
+            <option value="#007bff">🔵 Royal Blue</option>
+            <option value="#dc3545">🔴 Deep Red</option>
+            <option value="#6f42c1">🟣 Purple</option>
+            <option value="#fd7e14">🟠 Amber Orange</option>
         </select>
-      </div>
-    </header>
+    </div>
 
-    <!-- Upload Card -->
-    <section class="card rounded-2xl p-5 shadow-lg">
-      <h2 class="text-base font-extrabold flex items-center gap-2 mb-4">
-        📂 Upload Agent Performance CSV File
-      </h2>
+    <!-- Controls Row 2 -->
+    <div class="control-row-2">
+        <button class="btn-black" onclick="resetData()">Reset</button>
+        <button class="btn-black" onclick="copyScreenshot()">Copy Screenshot</button>
+    </div>
 
-      <div class="space-y-3">
-        <input 
-          type="text" 
-          id="teamInput" 
-          placeholder="Dialer / Team Name (e.g. 2.0, 2.1, Outbound 1)" 
-          class="w-full bg-main border border-custom rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500"
-        >
+    <!-- File Upload Box -->
+    <div class="upload-box" onclick="document.getElementById('csvFileInput').click()">
+        📄 📑 <span>Upload / Drag & Drop Vicidialer CSV File</span>
+        <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileUpload(event)">
+    </div>
 
-        <div 
-          id="dropArea" 
-          onclick="document.getElementById('csvInput').click()" 
-          class="border-2 border-dashed border-custom rounded-xl p-6 text-center cursor-pointer hover:bg-hover transition"
-        >
-          <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="handleFileSelect(event)">
-          <div class="flex items-center justify-center gap-3">
-            <span class="bg-card border border-custom px-3 py-1.5 rounded-md text-xs font-bold">Choose File</span>
-            <span id="fileName" class="text-xs text-muted font-medium">No file chosen</span>
-          </div>
+    <!-- Team Filters -->
+    <div class="teams-container" id="teamsFilterContainer">
+        <button class="team-pill active" onclick="filterTeam('All Teams', this)">All Teams</button>
+        <button class="team-pill" onclick="filterTeam('OTHER', this)">OTHER</button>
+        <button class="team-pill" onclick="filterTeam('2.0', this)">2.0</button>
+        <button class="team-pill" onclick="filterTeam('HQ', this)">HQ</button>
+        <button class="team-pill" onclick="filterTeam('2.1', this)">2.1</button>
+        <button class="team-pill" onclick="filterTeam('Team A', this)">Team A</button>
+        <button class="team-pill" onclick="filterTeam('HQ new', this)">HQ new</button>
+        <button class="team-pill" onclick="filterTeam('2.0NB', this)">2.0NB</button>
+        <button class="team-pill" onclick="filterTeam('3.0', this)">3.0</button>
+        <button class="team-pill" onclick="filterTeam('3.1', this)">3.1</button>
+    </div>
+
+    <!-- Report Card Container -->
+    <div class="card-container" id="captureCard">
+        <div class="card-header-top">
+            <span class="filename-text" id="filenameDisplay">AGENT_PERFORMACE_DETAIL20261001-104413.csv</span>
+            <span class="badge-agents" id="agentCountBadge">15 AGENTS DETECTED</span>
         </div>
 
-        <div class="flex gap-3 pt-2">
-          <button 
-            onclick="processUpload()" 
-            class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md"
-          >
-            📊 Upload & Generate Dashboard
-          </button>
-          <button 
-            onclick="clearAllData()" 
-            class="bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2"
-          >
-            🗑️ Clear All Reports
-          </button>
+        <div class="manager-title-banner" id="cardManagerTitle">
+            Qaiser Khan
         </div>
-      </div>
-    </section>
 
-    <!-- Filter Pills -->
-    <section class="flex flex-wrap gap-2" id="filterPills">
-      <button class="pill-btn active text-xs font-extrabold px-4 py-2 rounded-full" onclick="setFilter('ALL', this)">🌐 ALL TEAMS</button>
-    </section>
-
-    <!-- Overall Header Summary Table -->
-    <section class="card rounded-2xl p-5 shadow-lg overflow-hidden">
-      <h2 class="text-base font-extrabold flex items-center gap-2 mb-4">
-        📊 Overall Header Summary (Editable)
-      </h2>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-xs font-bold text-left">
-          <thead class="table-header uppercase text-[10px] tracking-wider">
-            <tr>
-              <th class="py-3 px-4">Dialer / Team</th>
-              <th class="py-3 px-4 text-center">Agents</th>
-              <th class="py-3 px-4 text-center">Total Calls</th>
-              <th class="py-3 px-4 text-center">Last Hr Calls</th>
-              <th class="py-3 px-4 text-center">Total Deals</th>
-              <th class="py-3 px-4 text-center">Last Hr Deals</th>
-              <th class="py-3 px-4 text-center">Conv %</th>
-              <th class="py-3 px-4 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody id="summaryBody" class="divide-y divide-custom">
-            <tr>
-              <td colspan="8" class="text-center py-6 text-muted font-medium">No reports uploaded yet.</td>
-            </tr>
-          </tbody>
+        <table class="reporter-table">
+            <thead>
+                <tr>
+                    <th>USER</th>
+                    <th>ID</th>
+                    <th>D1</th>
+                    <th>D5</th>
+                    <th>D8</th>
+                    <th>TOTAL</th>
+                    <th>SALES</th>
+                    <th>CONV</th>
+                    <th>LAST HR</th>
+                </tr>
+            </thead>
+            <tbody id="agentTableBody">
+                <!-- Pre-populated Sample Data matching your exact image -->
+                <tr>
+                    <td>Michael Tolliver-HQ</td>
+                    <td>1001</td>
+                    <td>69</td>
+                    <td>38</td>
+                    <td>77</td>
+                    <td>184</td>
+                    <td>82</td>
+                    <td class="conv-val">44.5%</td>
+                    <td>12</td>
+                </tr>
+                <tr>
+                    <td>Danny Parker 2.0</td>
+                    <td>2018</td>
+                    <td>79</td>
+                    <td>23</td>
+                    <td>75</td>
+                    <td>177</td>
+                    <td>79</td>
+                    <td class="conv-val">44.6%</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>Dan Muccray-HQ</td>
+                    <td>1016</td>
+                    <td>59</td>
+                    <td>46</td>
+                    <td>64</td>
+                    <td>169</td>
+                    <td>71</td>
+                    <td class="conv-val">42.0%</td>
+                    <td>11</td>
+                </tr>
+                <tr>
+                    <td>Jordan Ford-HQ</td>
+                    <td>1002</td>
+                    <td>58</td>
+                    <td>22</td>
+                    <td>65</td>
+                    <td>145</td>
+                    <td>64</td>
+                    <td class="conv-val">44.1%</td>
+                    <td>9</td>
+                </tr>
+                <tr>
+                    <td>Bryan Grayson 2.0</td>
+                    <td>2004</td>
+                    <td>53</td>
+                    <td>14</td>
+                    <td>58</td>
+                    <td>125</td>
+                    <td>55</td>
+                    <td class="conv-val">44.0%</td>
+                    <td>8</td>
+                </tr>
+            </tbody>
         </table>
-      </div>
-    </section>
+    </div>
+</div>
 
-    <!-- Consolidated Ranking Table -->
-    <section class="card rounded-2xl p-5 shadow-lg overflow-hidden">
-      <h2 class="text-base font-extrabold flex items-center gap-2 mb-4">
-        🏆 ALL TEAMS Consolidated Performance Ranking (Top to Low)
-      </h2>
+<script>
+    // Live title update
+    const managerInput = document.getElementById('managerInput');
+    const cardManagerTitle = document.getElementById('cardManagerTitle');
+    
+    managerInput.addEventListener('input', function() {
+        cardManagerTitle.innerText = this.value || 'Manager Name';
+    });
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-xs font-bold text-left">
-          <thead class="table-header uppercase text-[10px] tracking-wider">
-            <tr>
-              <th class="py-3 px-3 text-center">Rank</th>
-              <th class="py-3 px-4">Agent Name</th>
-              <th class="py-3 px-3">Team</th>
-              <th class="py-3 px-3 text-center">Total Calls</th>
-              <th class="py-3 px-3 text-center">Last Hr Calls</th>
-              <th class="py-3 px-3 text-center">Total Deals</th>
-              <th class="py-3 px-3 text-center">Last Hr Deals</th>
-              <th class="py-3 px-3 text-center">Conv %</th>
-              <th class="py-3 px-3 text-center">Status</th>
-              <th class="py-3 px-3 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody id="rankingBody" class="divide-y divide-custom">
-            <tr>
-              <td colspan="10" class="text-center py-6 text-muted font-medium">No agent data available for this view.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-  </div>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 card text-main border border-custom px-4 py-3 rounded-xl font-bold text-xs shadow-2xl hidden z-50"></div>
-
-  <script>
-    let uploadedReports = [];
-    let activeFilter = 'ALL';
-    let selectedFile = null;
-
-    function switchTheme(theme) {
-      document.body.className = `${theme} min-h-screen p-4 sm:p-6 lg:p-8`;
-    }
-
-    function showToast(text) {
-      const toast = document.getElementById('toast');
-      toast.innerText = text;
-      toast.classList.remove('hidden');
-      toast.classList.add('toast-msg');
-      setTimeout(() => {
-        toast.classList.add('hidden');
-        toast.classList.remove('toast-msg');
-      }, 2500);
-    }
-
-    function handleFileSelect(evt) {
-      const file = evt.target.files[0];
-      if (file) {
-        selectedFile = file;
-        document.getElementById('fileName').innerText = file.name;
-      }
-    }
-
-    function processUpload() {
-      const teamName = document.getElementById('teamInput').value.trim() || 'Team 1';
-      
-      if (!selectedFile) {
-        showToast("Please choose a CSV file first!");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const text = e.target.result;
-        const rows = text.split('\n');
-        let agents = [];
-
-        rows.forEach((row, idx) => {
-          if (idx === 0 || !row.trim()) return;
-          const cols = row.split(',').map(c => c.trim().replace(/"/g, ''));
-          if (cols.length >= 2) {
-            const calls = parseInt(cols[2]) || Math.floor(Math.random() * 100) + 20;
-            const lastHrCalls = parseInt(cols[3]) || Math.floor(Math.random() * 15) + 1;
-            const deals = parseInt(cols[4]) || Math.floor(Math.random() * 10);
-            const lastHrDeals = parseInt(cols[5]) || Math.floor(Math.random() * 3);
-            const conv = calls > 0 ? ((deals / calls) * 100).toFixed(1) : "0.0";
-
-            agents.push({
-              name: cols[0] || `Agent ${idx}`,
-              team: teamName,
-              calls: calls,
-              lastHrCalls: lastHrCalls,
-              deals: deals,
-              lastHrDeals: lastHrDeals,
-              conv: conv
-            });
-          }
+    // Color theme switcher
+    function changeTheme(color) {
+        document.querySelectorAll('.reporter-table tbody tr').forEach(tr => {
+            tr.style.backgroundColor = color;
         });
+        document.getElementById('cardManagerTitle').style.backgroundColor = color;
+        document.getElementById('agentCountBadge').style.backgroundColor = color;
+    }
 
-        if (agents.length > 0) {
-          uploadedReports.push({
-            team: teamName,
-            agents: agents
-          });
+    // Team Filter Active Toggle
+    function filterTeam(teamName, btn) {
+        document.querySelectorAll('.team-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        // CSV filter logic goes here
+    }
 
-          document.getElementById('teamInput').value = '';
-          document.getElementById('fileName').innerText = 'No file chosen';
-          selectedFile = null;
+    // Reset Data
+    function resetData() {
+        managerInput.value = "Qaiser Khan";
+        cardManagerTitle.innerText = "Qaiser Khan";
+        document.getElementById('filenameDisplay').innerText = "NO FILE UPLOADED";
+        document.getElementById('agentCountBadge').innerText = "0 AGENTS DETECTED";
+        document.getElementById('agentTableBody').innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 20px;">Upload a CSV file to view report</td></tr>`;
+    }
 
-          updateDashboard();
-          showToast(`Report added for ${teamName}!`);
-        } else {
-          showToast("Invalid CSV format.");
+    // Copy Screenshot
+    function copyScreenshot() {
+        const card = document.getElementById('captureCard');
+        html2canvas(card, { scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+                try {
+                    navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    alert('Screenshot copied to clipboard!');
+                } catch (err) {
+                    alert('Clipboard write failed. Downloading image instead.');
+                    const link = document.createElement('a');
+                    link.download = 'performance-report.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                }
+            });
+        });
+    }
+
+    // CSV File Processor
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('filenameDisplay').innerText = file.name;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            parseCSV(text);
+        };
+        reader.readAsText(file);
+    }
+
+    function parseCSV(text) {
+        const lines = text.split('\n').filter(l => l.trim().length > 0);
+        if (lines.length < 2) return;
+
+        const tbody = document.getElementById('agentTableBody');
+        tbody.innerHTML = '';
+        let count = 0;
+
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
+            if (cols.length >= 8) {
+                count++;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${cols[0] || 'Agent'}</td>
+                    <td>${cols[1] || '-'}</td>
+                    <td>${cols[2] || '0'}</td>
+                    <td>${cols[3] || '0'}</td>
+                    <td>${cols[4] || '0'}</td>
+                    <td>${cols[5] || '0'}</td>
+                    <td>${cols[6] || '0'}</td>
+                    <td class="conv-val">${cols[7] || '0%'}</td>
+                    <td>${cols[8] || '0'}</td>
+                `;
+                tbody.appendChild(tr);
+            }
         }
-      };
 
-      reader.readAsText(selectedFile);
+        document.getElementById('agentCountBadge').innerText = `${count} AGENTS DETECTED`;
+        const currentTheme = document.getElementById('themeSelect').value;
+        changeTheme(currentTheme);
     }
+</script>
 
-    function setFilter(team, btn) {
-      activeFilter = team;
-      document.querySelectorAll('#filterPills button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderRankingTable();
-    }
-
-    function updateDashboard() {
-      renderFilterPills();
-      renderSummaryTable();
-      renderRankingTable();
-    }
-
-    function renderFilterPills() {
-      const container = document.getElementById('filterPills');
-      container.innerHTML = `<button class="pill-btn ${activeFilter === 'ALL' ? 'active' : ''} text-xs font-extrabold px-4 py-2 rounded-full" onclick="setFilter('ALL', this)">🌐 ALL TEAMS</button>`;
-
-      uploadedReports.forEach(rep => {
-        const btn = document.createElement('button');
-        btn.className = `pill-btn ${activeFilter === rep.team ? 'active' : ''} text-xs font-extrabold px-4 py-2 rounded-full`;
-        btn.innerText = rep.team;
-        btn.onclick = () => setFilter(rep.team, btn);
-        container.appendChild(btn);
-      });
-    }
-
-    function renderSummaryTable() {
-      const tbody = document.getElementById('summaryBody');
-      tbody.innerHTML = '';
-
-      if (uploadedReports.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-muted font-medium">No reports uploaded yet.</td></tr>`;
-        return;
-      }
-
-      uploadedReports.forEach((rep, idx) => {
-        const totalCalls = rep.agents.reduce((acc, a) => acc + a.calls, 0);
-        const lastHrCalls = rep.agents.reduce((acc, a) => acc + a.lastHrCalls, 0);
-        const totalDeals = rep.agents.reduce((acc, a) => acc + a.deals, 0);
-        const lastHrDeals = rep.agents.reduce((acc, a) => acc + a.lastHrDeals, 0);
-        const conv = totalCalls > 0 ? ((totalDeals / totalCalls) * 100).toFixed(1) : "0.0";
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-hover transition";
-        tr.innerHTML = `
-          <td class="py-3 px-4 font-black">${rep.team}</td>
-          <td class="py-3 px-4 text-center">${rep.agents.length}</td>
-          <td class="py-3 px-4 text-center">${totalCalls}</td>
-          <td class="py-3 px-4 text-center">${lastHrCalls}</td>
-          <td class="py-3 px-4 text-center text-emerald-500 font-black">${totalDeals}</td>
-          <td class="py-3 px-4 text-center text-emerald-500 font-black">${lastHrDeals}</td>
-          <td class="py-3 px-4 text-center">${conv}%</td>
-          <td class="py-3 px-4 text-center">
-            <button onclick="deleteTeam(${idx})" class="text-red-500 hover:text-red-400 font-bold">🗑️</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function renderRankingTable() {
-      const tbody = document.getElementById('rankingBody');
-      tbody.innerHTML = '';
-
-      let allAgents = [];
-      uploadedReports.forEach(rep => {
-        if (activeFilter === 'ALL' || activeFilter === rep.team) {
-          allAgents = allAgents.concat(rep.agents);
-        }
-      });
-
-      if (allAgents.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-muted font-medium">No agent data available for this view.</td></tr>`;
-        return;
-      }
-
-      // Sort High to Low Deals then Calls
-      allAgents.sort((a, b) => b.deals - a.deals || b.calls - a.calls);
-
-      allAgents.forEach((agent, rank) => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-hover transition";
-
-        let rankBadge = `#${rank + 1}`;
-        if (rank === 0) rankBadge = '🥇 1';
-        if (rank === 1) rankBadge = '🥈 2';
-        if (rank === 2) rankBadge = '🥉 3';
-
-        tr.innerHTML = `
-          <td class="py-3 px-3 text-center font-black">${rankBadge}</td>
-          <td class="py-3 px-4 font-extrabold">${agent.name}</td>
-          <td class="py-3 px-3"><span class="bg-card border border-custom px-2 py-0.5 rounded text-[10px] font-bold">${agent.team}</span></td>
-          <td class="py-3 px-3 text-center">${agent.calls}</td>
-          <td class="py-3 px-3 text-center">${agent.lastHrCalls}</td>
-          <td class="py-3 px-3 text-center text-emerald-500 font-black">${agent.deals}</td>
-          <td class="py-3 px-3 text-center text-emerald-500 font-black">${agent.lastHrDeals}</td>
-          <td class="py-3 px-3 text-center">${agent.conv}%</td>
-          <td class="py-3 px-3 text-center">
-            <span class="bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full text-[10px] font-black uppercase">Active</span>
-          </td>
-          <td class="py-3 px-3 text-center">
-            <button onclick="showToast('Agent details saved')" class="text-muted hover:text-main">✏️</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function deleteTeam(index) {
-      uploadedReports.splice(index, 1);
-      activeFilter = 'ALL';
-      updateDashboard();
-      showToast("Team report deleted");
-    }
-
-    function clearAllData() {
-      uploadedReports = [];
-      activeFilter = 'ALL';
-      updateDashboard();
-      showToast("All dashboard data cleared!");
-    }
-  </script>
 </body>
 </html>
