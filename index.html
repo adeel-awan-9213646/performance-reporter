@@ -147,12 +147,12 @@
 
         /* Main Card Area */
         .card-container {
-            background-color: #ffffff;
+            background-color: #000000;
             border: 2px solid #000000;
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 20px;
             overflow-x: auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .card-header-top {
@@ -165,12 +165,12 @@
         .filename-text {
             font-size: 12px;
             font-weight: 800;
-            color: #333333;
+            color: #ffffff;
             font-family: monospace;
         }
 
         .badge-agents {
-            background-color: #000000;
+            background-color: #00a86b;
             color: #ffffff;
             font-size: 12px;
             font-weight: 900;
@@ -179,18 +179,18 @@
         }
 
         .manager-title-banner {
-            background-color: #000000;
+            background-color: #00a86b;
             color: #ffffff;
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 900;
             text-align: center;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 14px;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
             letter-spacing: 0.5px;
         }
 
-        /* True Excel Sheet Grid Styling */
+        /* Excel Sheet Layout */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -199,86 +199,128 @@
         .excel-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 15px;
             min-width: 800px;
             background-color: #ffffff;
-            border: 2px solid #7f8c8d;
         }
 
-        /* Excel Header */
+        /* Header Styling */
         .excel-table th {
-            background-color: #b0bec5;
-            color: #000000;
+            background-color: #000000;
+            color: #ffffff;
             font-weight: 900;
             text-align: center;
-            padding: 10px 8px;
-            border: 1px solid #7f8c8d;
+            padding: 12px 10px;
             font-size: 14px;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
+            border: 1px solid #333333;
         }
 
         .excel-table th:first-child {
             text-align: left;
-            padding-left: 14px;
-            min-width: 220px;
+            padding-left: 16px;
+            min-width: 200px;
         }
 
-        /* Excel Summary Row (Top Totals Row) */
-        .summary-row td {
-            background-color: #cfd8dc;
-            color: #000000;
-            font-weight: 900;
-            font-size: 15px;
-            text-align: center;
-            padding: 10px 8px;
-            border: 1px solid #7f8c8d;
-        }
-
-        .summary-row td.total-grand-cell {
-            background-color: #00a86b !important; /* Green total highlight */
+        /* Row Tier Color Coding */
+        .excel-table tbody tr.tier-green {
+            background-color: #00a86b !important;
             color: #ffffff !important;
-            font-size: 16px;
         }
 
-        /* Excel Data Body Rows */
-        .excel-table tbody tr {
-            border-bottom: 1px solid #b0bec5;
+        .excel-table tbody tr.tier-yellow {
+            background-color: #d99b00 !important;
+            color: #ffffff !important;
         }
 
-        .excel-table tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-
-        .excel-table tbody tr:nth-child(odd) {
-            background-color: #ffffff;
+        .excel-table tbody tr.tier-red {
+            background-color: #c0392b !important;
+            color: #ffffff !important;
         }
 
         .excel-table td {
-            padding: 8px 10px;
+            padding: 10px;
             text-align: center;
-            font-weight: 800;
-            color: #000000;
-            border: 1px solid #cfd8dc;
+            font-weight: 900;
             outline: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .excel-table td[contenteditable="true"]:hover {
-            background-color: #e2e8f0;
+            opacity: 0.9;
             cursor: text;
         }
 
         .excel-table td:first-child {
             text-align: left;
-            padding-left: 14px;
-            font-weight: 800;
+            padding-left: 16px;
         }
 
-        /* Red Total Column Highlight */
-        .excel-table td.total-col-cell {
-            background-color: #d93838 !important; /* Red highlight for totals */
-            color: #ffffff !important;
+        /* Summary Total Row at BOTTOM */
+        .summary-row td {
+            background-color: #cfd8dc !important;
+            color: #000000 !important;
             font-weight: 900;
             font-size: 15px;
+            text-align: center;
+            padding: 12px 10px;
+            border: 1px solid #7f8c8d !important;
+        }
+
+        .summary-row td.total-grand-cell {
+            background-color: #00a86b !important;
+            color: #ffffff !important;
+            font-size: 16px;
+        }
+
+        /* Small Summary Card (Bottom Center) */
+        .summary-box-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .summary-mini-table {
+            border-collapse: collapse;
+            width: 280px;
+            border: 2px solid #555555;
+            background-color: #fce8db; /* Light peach header tone */
+            font-weight: 900;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .summary-mini-table td {
+            padding: 8px 12px;
+            border: 1px solid #888888;
+            font-size: 16px;
+            color: #000000;
+        }
+
+        .summary-mini-table tr td:first-child {
+            text-align: left;
+            background-color: #fae3d5;
+            width: 60%;
+        }
+
+        .summary-mini-table tr td:last-child {
+            text-align: center;
+            background-color: #ffffff;
+        }
+
+        .summary-mini-table tr.lpd-row td:last-child {
+            background-color: #00a86b;
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        /* Developer Footer */
+        .developer-footer {
+            text-align: center;
+            color: #888888;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 15px;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -293,7 +335,7 @@
     <div class="control-row-1">
         <input type="text" id="managerInput" class="input-box" value="Qaiser Khan" placeholder="Manager Name">
         <select id="themeSelect" class="select-box">
-            <option value="default">📊 Excel Grid Sheet Theme</option>
+            <option value="default">🚦 Performance Tiers (Green/Yellow/Red)</option>
         </select>
     </div>
 
@@ -334,7 +376,7 @@
             <table class="excel-table">
                 <thead>
                     <tr id="tableHeaderRow">
-                        <th>USER NAME</th>
+                        <th>USER</th>
                         <th>ID</th>
                         <th>TOTAL CALLS</th>
                         <th>D1</th>
@@ -349,16 +391,38 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Small Summary Table Box in Center -->
+        <div class="summary-box-wrapper">
+            <table class="summary-mini-table">
+                <tr>
+                    <td>Total Sales</td>
+                    <td id="miniTotalSales">0</td>
+                </tr>
+                <tr>
+                    <td>Total Agents</td>
+                    <td id="miniTotalAgents">0</td>
+                </tr>
+                <tr class="lpd-row">
+                    <td>L.P.D</td>
+                    <td id="miniLpdVal">0.00</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="developer-footer">
+            Developed by Adeel Awan
+        </div>
     </div>
 </div>
 
 <script>
     let rawAgentsData = [
-        { name: "Michael Tolliver-HQ", id: "1001", totalCalls: 184, d1: 69, d5: 38, d8: 77, d9: 0, sales: 82, conv: "44.5%" },
-        { name: "Danny Parker 2.0", id: "2018", totalCalls: 177, d1: 79, d5: 23, d8: 75, d9: 0, sales: 79, conv: "44.6%" },
-        { name: "Dan Muccray-HQ", id: "1016", totalCalls: 169, d1: 59, d5: 46, d8: 64, d9: 0, sales: 71, conv: "42.0%" },
-        { name: "Jordan Ford-HQ", id: "1002", totalCalls: 145, d1: 58, d5: 22, d8: 65, d9: 0, sales: 64, conv: "44.1%" },
-        { name: "Bryan Grayson 2.1", id: "2004", totalCalls: 125, d1: 53, d5: 14, d8: 58, d9: 0, sales: 55, conv: "44.0%" }
+        { name: "Michael Tolliver-HQ", id: "1001", totalCalls: 184, d1: 69, d5: 38, d8: 77, sales: 82, conv: "44.5%" },
+        { name: "Danny Parker 2.0", id: "2018", totalCalls: 177, d1: 79, d5: 23, d8: 75, sales: 79, conv: "44.6%" },
+        { name: "Dan Muccray-HQ", id: "1016", totalCalls: 169, d1: 59, d5: 46, d8: 64, sales: 71, conv: "42.0%" },
+        { name: "Jordan Ford-HQ", id: "1002", totalCalls: 145, d1: 58, d5: 22, d8: 65, sales: 64, conv: "44.1%" },
+        { name: "Bryan Grayson 2.1", id: "2004", totalCalls: 125, d1: 53, d5: 14, d8: 58, sales: 55, conv: "44.0%" }
     ];
 
     let currentSelectedTeam = "All Teams";
@@ -377,90 +441,97 @@
             return agent.name.toLowerCase().includes(currentSelectedTeam.toLowerCase());
         });
 
-        // Sort Highest to Lowest
+        // Sort Highest to Lowest Sales
         filtered.sort((a, b) => (b.sales || b.totalCalls) - (a.sales || a.totalCalls));
 
-        // Find Dynamic Dispositions (D1 to D9)
-        let activeDispositions = [];
-        for (let i = 1; i <= 9; i++) {
-            let key = 'd' + i;
-            let hasValue = filtered.some(a => a[key] && Number(a[key]) > 0);
-            if (hasValue) {
-                activeDispositions.push(i);
-            }
-        }
+        // Active Dispositions
+        let activeDispositions = [1, 5, 8];
 
-        // Calculate Totals for Top Summary Row
-        let totalCallsSum = 0;
-        let totalSalesSum = 0;
-        let dispTotals = {};
-        activeDispositions.forEach(d => dispTotals['d' + d] = 0);
-
-        filtered.forEach(agent => {
-            totalCallsSum += (Number(agent.totalCalls) || 0);
-            totalSalesSum += (Number(agent.sales) || 0);
-            activeDispositions.forEach(d => {
-                dispTotals['d' + d] += (Number(agent['d' + d]) || 0);
-            });
-        });
-
-        // 1. Render Excel Table Header
-        let headerHTML = `<th>USER NAME</th><th>ID</th><th>TOTAL CALLS</th>`;
+        // 1. Header
+        let headerHTML = `<th>USER</th><th>ID</th><th>TOTAL CALLS</th>`;
         activeDispositions.forEach(dNum => {
             headerHTML += `<th>D${dNum}</th>`;
         });
         headerHTML += `<th>TOTAL SALES</th><th>CONV %</th>`;
         document.getElementById('tableHeaderRow').innerHTML = headerHTML;
 
-        // 2. Render Excel Table Body
+        // 2. Render Agent Rows
         let tbody = document.getElementById('agentTableBody');
         tbody.innerHTML = '';
 
-        // Add Top Excel Summary Row
-        let summaryRow = document.createElement('tr');
-        summaryRow.className = 'summary-row';
-        let summaryHTML = `
-            <td></td>
-            <td></td>
-            <td contenteditable="true">${totalCallsSum}</td>
-        `;
-        activeDispositions.forEach(dNum => {
-            summaryHTML += `<td contenteditable="true">${dispTotals['d' + dNum]}</td>`;
-        });
-        summaryHTML += `<td contenteditable="true" class="total-grand-cell">${totalSalesSum}</td><td></td>`;
-        summaryRow.innerHTML = summaryHTML;
-        tbody.appendChild(summaryRow);
+        let totalCallsSum = 0;
+        let totalSalesSum = 0;
+        let dispTotals = { d1: 0, d5: 0, d8: 0 };
 
-        // Add Agent Rows
         if (filtered.length === 0) {
             let emptyTr = document.createElement('tr');
-            emptyTr.innerHTML = `<td colspan="12" style="text-align:center; padding: 20px;">No agents found for team ${currentSelectedTeam}</td>`;
+            emptyTr.innerHTML = `<td colspan="8" style="text-align:center; padding: 20px; color: black; background: #fff;">No agents found for ${currentSelectedTeam}</td>`;
             tbody.appendChild(emptyTr);
             document.getElementById('agentCountBadge').innerText = `0 AGENTS DETECTED`;
+            document.getElementById('miniTotalSales').innerText = "0";
+            document.getElementById('miniTotalAgents').innerText = "0";
+            document.getElementById('miniLpdVal').innerText = "0.00";
             return;
         }
 
-        filtered.forEach(agent => {
+        let totalAgents = filtered.length;
+
+        filtered.forEach((agent, index) => {
+            totalCallsSum += (Number(agent.totalCalls) || 0);
+            totalSalesSum += (Number(agent.sales) || 0);
+            dispTotals.d1 += (Number(agent.d1) || 0);
+            dispTotals.d5 += (Number(agent.d5) || 0);
+            dispTotals.d8 += (Number(agent.d8) || 0);
+
             let tr = document.createElement('tr');
+
+            // Tier Color Calculation
+            let tierClass = "tier-red";
+            if (index < Math.ceil(totalAgents * 0.35)) {
+                tierClass = "tier-green"; // Green Row
+            } else if (index < Math.ceil(totalAgents * 0.70)) {
+                tierClass = "tier-yellow"; // Yellow Row
+            } else {
+                tierClass = "tier-red"; // Red Row
+            }
+
+            tr.className = tierClass;
+
             let rowContent = `
                 <td contenteditable="true">${agent.name}</td>
                 <td contenteditable="true">${agent.id}</td>
                 <td contenteditable="true">${agent.totalCalls}</td>
-            `;
-
-            activeDispositions.forEach(dNum => {
-                let key = 'd' + dNum;
-                rowContent += `<td contenteditable="true">${agent[key] || 0}</td>`;
-            });
-
-            rowContent += `
-                <td contenteditable="true" class="total-col-cell">${agent.sales}</td>
+                <td contenteditable="true">${agent.d1 || 0}</td>
+                <td contenteditable="true">${agent.d5 || 0}</td>
+                <td contenteditable="true">${agent.d8 || 0}</td>
+                <td contenteditable="true">${agent.sales}</td>
                 <td contenteditable="true">${agent.conv}</td>
             `;
 
             tr.innerHTML = rowContent;
             tbody.appendChild(tr);
         });
+
+        // 3. Add Summary Total Row AT THE LAST (BOTTOM)
+        let summaryRow = document.createElement('tr');
+        summaryRow.className = 'summary-row';
+        summaryRow.innerHTML = `
+            <td></td>
+            <td></td>
+            <td contenteditable="true">${totalCallsSum}</td>
+            <td contenteditable="true">${dispTotals.d1}</td>
+            <td contenteditable="true">${dispTotals.d5}</td>
+            <td contenteditable="true">${dispTotals.d8}</td>
+            <td contenteditable="true" class="total-grand-cell">${totalSalesSum}</td>
+            <td></td>
+        `;
+        tbody.appendChild(summaryRow);
+
+        // Update Small Mini Summary Box
+        let lpd = totalAgents > 0 ? (totalSalesSum / totalAgents).toFixed(2) : "0.00";
+        document.getElementById('miniTotalSales').innerText = totalSalesSum;
+        document.getElementById('miniTotalAgents').innerText = totalAgents;
+        document.getElementById('miniLpdVal').innerText = lpd;
 
         document.getElementById('agentCountBadge').innerText = `${filtered.length} AGENTS DETECTED`;
     }
@@ -528,7 +599,6 @@
                     d1: parseInt(cols[2]) || 0,
                     d5: parseInt(cols[3]) || 0,
                     d8: parseInt(cols[4]) || 0,
-                    d9: parseInt(cols[9]) || 0,
                     sales: parseInt(cols[6]) || 0,
                     conv: cols[7] || '0%'
                 });
