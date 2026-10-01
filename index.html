@@ -3,302 +3,298 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agent Workstation & Video Wall Configurator</title>
-  <!-- Tailwind CSS -->
+  <title>Performance Reporter - Vicidialer Transformation</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
-    @keyframes pulse-slow {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+    .editable-cell {
+      outline: none;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
     }
-    .animate-pulse-slow {
-      animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    .editable-cell:focus {
+      background-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 0 0 2px #fff;
     }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+<body class="bg-black text-white min-h-screen font-sans p-4 sm:p-6 max-w-4xl mx-auto">
 
-  <!-- Header -->
-  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="p-2 bg-indigo-600 rounded-lg text-white">
-          <i data-lucide="layout-grid" class="w-6 h-6"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-lg leading-tight">Workstation & Video Wall Studio</h1>
-          <p class="text-xs text-slate-400">VICI Dialer & Monitoring Command Center</p>
-        </div>
-      </div>
-      <div class="flex items-center space-x-4">
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> System Operational
-        </span>
-      </div>
-    </div>
+  <!-- Header Section -->
+  <header class="mb-4">
+    <h1 class="text-3xl font-extrabold text-black tracking-tight bg-white px-2 py-1 inline-block rounded">Performance Reporter</h1>
+    <p class="text-gray-400 text-sm mt-1 font-semibold">Automated Vicidialer Transformation</p>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+  <!-- Control Controls Top Bar -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+    <input type="text" id="supervisorName" value="Qaiser Khan" class="bg-white text-black font-bold px-3 py-2 rounded-lg border-2 border-black focus:outline-none text-base">
+    
+    <div class="flex gap-2">
+      <select id="themeSelect" onchange="changeTheme(this.value)" class="bg-white text-black font-bold px-3 py-2 rounded-lg border-2 border-black flex-1 text-base">
+        <option value="classic-green">🟢 Classic Green</option>
+        <option value="ocean-blue">🔵 Ocean Blue</option>
+        <option value="crimson-red">🔴 Crimson Red</option>
+        <option value="amber-gold">🟡 Amber Gold</option>
+        <option value="purple-dark">🟣 Dark Purple</option>
+        <option value="custom">🎨 Custom Color</option>
+      </select>
+      <input type="color" id="customColorPicker" value="#16a34a" onchange="applyCustomColor(this.value)" class="h-10 w-12 rounded cursor-pointer hidden border-2 border-white">
+    </div>
+  </div>
 
-    <!-- Top Stats Row -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Active Screens</p>
-          <p class="text-2xl font-bold text-white mt-1" id="activeScreensCount">8 Display Wall</p>
-        </div>
-        <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-lg">
-          <i data-lucide="monitor" class="w-6 h-6"></i>
-        </div>
-      </div>
-      <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Dialer Engine</p>
-          <p class="text-2xl font-bold text-emerald-400 mt-1">VICI / Asterisk</p>
-        </div>
-        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg">
-          <i data-lucide="phone-call" class="w-6 h-6"></i>
-        </div>
-      </div>
-      <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Avg Occupancy</p>
-          <p class="text-2xl font-bold text-amber-400 mt-1" id="occupancyVal">91.4%</p>
-        </div>
-        <div class="p-3 bg-amber-500/10 text-amber-400 rounded-lg">
-          <i data-lucide="activity" class="w-6 h-6"></i>
-        </div>
-      </div>
-      <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Wall Layout</p>
-          <p class="text-2xl font-bold text-cyan-400 mt-1">Dual Wall 4x2</p>
-        </div>
-        <div class="p-3 bg-cyan-500/10 text-cyan-400 rounded-lg">
-          <i data-lucide="tv" class="w-6 h-6"></i>
-        </div>
-      </div>
+  <div class="flex gap-3 mb-6">
+    <button onclick="resetData()" class="bg-black text-white font-bold border-2 border-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">Reset</button>
+    <button onclick="copyScreenshot()" class="bg-black text-white font-bold border-2 border-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">Copy Screenshot</button>
+  </div>
+
+  <!-- Upload Area -->
+  <div id="dropZone" onclick="document.getElementById('csvInput').click()" class="border-2 border-dashed border-gray-400 rounded-xl p-6 text-center cursor-pointer hover:bg-gray-900 transition mb-6 bg-black">
+    <p class="text-sm font-bold text-gray-200 flex items-center justify-center gap-2">
+      📄 Upload / Drag & Drop Vicidialer CSV File
+    </p>
+    <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+  </div>
+
+  <!-- Team Filter Buttons -->
+  <div class="bg-gray-200 p-3 rounded-2xl border-2 border-black mb-6">
+    <div class="flex flex-wrap gap-2" id="teamFilterContainer">
+      <button onclick="filterTeam('ALL')" class="team-btn bg-black text-white font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">All Teams</button>
+      <button onclick="filterTeam('OTHER')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">OTHER</button>
+      <button onclick="filterTeam('2.0')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">2.0</button>
+      <button onclick="filterTeam('HQ')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">HQ</button>
+      <button onclick="filterTeam('2.1')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">2.1</button>
+      <button onclick="filterTeam('3.0')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">3.0</button>
+      <button onclick="filterTeam('3.1')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">3.1</button>
+      <button onclick="filterTeam('Team A')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">Team A</button>
+      <button onclick="filterTeam('HQ new')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">HQ new</button>
+      <button onclick="filterTeam('2.0NB')" class="team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm">2.0NB</button>
+    </div>
+  </div>
+
+  <!-- Main Report Capture Container -->
+  <div id="reportContainer" class="bg-black border-2 border-gray-800 rounded-xl overflow-hidden p-2">
+    
+    <!-- File Header Info -->
+    <div class="flex items-center justify-between p-3 bg-gray-900 rounded-lg mb-2 text-xs font-mono">
+      <span id="fileNameDisplay" class="text-gray-300 font-bold truncate">AGENT_PERFORMANCE_DETAIL.csv</span>
+      <span id="agentCountBadge" class="bg-emerald-600 text-black font-bold px-3 py-1 rounded-full uppercase">15 AGENTS DETECTED</span>
     </div>
 
-    <!-- Main Visualizer Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      
-      <!-- Video Wall Visualizer (2 Cols) -->
-      <div class="lg:col-span-2 bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 space-y-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i data-lucide="screen-share" class="w-5 h-5 text-indigo-400"></i> 8-Screen Command Video Wall
-            </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Real-time monitoring array across dual wall mount configuration</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <button id="toggleFeedBtn" onclick="toggleSimulatedFeeds()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Feeds
-            </button>
-          </div>
-        </div>
-
-        <!-- 8 Monitors Matrix -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
-          
-          <!-- Screen 1 -->
-          <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2 hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="font-bold text-indigo-400">DISPLAY 01</span>
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-            </div>
-            <div class="text-sm font-semibold text-slate-200">VICI Real-time Main</div>
-            <div class="text-xs text-slate-400">Agents Active: <span class="text-emerald-400 font-bold" id="agentsActive">42</span></div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-emerald-500 h-full" style="width: 85%"></div>
-            </div>
-          </div>
-
-          <!-- Screen 2 -->
-          <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2 hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="font-bold text-indigo-400">DISPLAY 02</span>
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-            </div>
-            <div class="text-sm font-semibold text-slate-200">Inbound Queue Matrix</div>
-            <div class="text-xs text-slate-400">Calls Waiting: <span class="text-amber-400 font-bold" id="callsWaiting">4</span></div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-amber-400 h-full" style="width: 40%"></div>
-            </div>
-          </div>
-
-          <!-- Screen 3 -->
-          <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2 hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="font-bold text-indigo-400">DISPLAY 03</span>
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-            </div>
-            <div class="text-sm font-semibold text-slate-200">Outbound Auto-Dial</div>
-            <div class="text-xs text-slate-400">Dial Ratio: <span class="text-cyan-400 font-bold">2.5:1</span></div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-cyan-400 h-full" style="width: 70%"></div>
-            </div>
-          </div>
-
-          <!-- Screen 4 -->
-          <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2 hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="font-bold text-indigo-400">DISPLAY 04</span>
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-            </div>
-            <div class="text-sm font-semibold text-slate-200">SLA & Drop Rate</div>
-            <div class="text-xs text-slate-400">Drop Rate: <span class="text-emerald-400 font-bold">1.2%</span></div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-emerald-400 h-full" style="width: 20%"></div>
-            </div>
-          </div>
-
-          <!-- Screen 5 -->
-          <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2 hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="font-bold text-indigo-400">DISPLAY 05</span>
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-            </div>
-            <div class="text-sm font-semibold text-slate-200">Campaign Analytics</div>
-            <div class="text-xs text-slate-400">Conversions: <span class="text-indigo-400 font-bold">184</span></div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-indigo-500 h-full" style="width: 65%"></div>
-            </div>
-          </div>
-
-          <!-- Screen 6 -->
-          <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2 hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="font-bold text-indigo-400">DISPLAY 06</span>
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-            </div>
-            <div class="text-sm font-semibold text-slate-200">Agent Status Map</div>
-            <div class="text-xs text-slate-400">On Call: <span class="text-emerald-400 font-bold">36</span> | Pause: <span class="text-amber-400 font-bold">6</span></div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-emerald-500 h-full" style="width: 80%"></div>
-            </div>
-          </div>
-
-          <!-- Screen 7 -->
-          <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2 hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="font-bold text-indigo-400">DISPLAY 07</span>
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-            </div>
-            <div class="text-sm font-semibold text-slate-200">SIP Trunk Traffic</div>
-            <div class="text-xs text-slate-400">Channels: <span class="text-cyan-400 font-bold">92 / 120</span></div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-cyan-500 h-full" style="width: 76%"></div>
-            </div>
-          </div>
-
-          <!-- Screen 8 -->
-          <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2 hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="font-bold text-indigo-400">DISPLAY 08</span>
-              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
-            </div>
-            <div class="text-sm font-semibold text-slate-200">System Performance</div>
-            <div class="text-xs text-slate-400">CPU Load: <span class="text-indigo-400 font-bold">28%</span></div>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-indigo-400 h-full" style="width: 28%"></div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Configuration Notice -->
-        <div class="bg-indigo-950/40 border border-indigo-800/40 rounded-xl p-4 flex items-start gap-3">
-          <i data-lucide="info" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
-          <p class="text-xs text-indigo-200/80 leading-relaxed">
-            <strong class="text-indigo-200">Video Wall Configuration:</strong> Designed for an 8-LCD multi-display wall setup across two primary office walls, providing real-time call center operations visibility, supervisor monitoring, and VICI dialer metric tracking.
-          </p>
-        </div>
-      </div>
-
-      <!-- Controls & Setup Panel (1 Col) -->
-      <div class="space-y-6">
-        
-        <!-- Quick Control Panel -->
-        <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 space-y-4">
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i> Dialing Parameters
-          </h3>
-
-          <div class="space-y-3">
-            <div>
-              <label class="text-xs font-semibold text-slate-400 block mb-1">Dial Level Auto-Pacing</label>
-              <input type="range" min="1" max="5" value="2.5" step="0.1" class="w-full accent-indigo-500 cursor-pointer" oninput="updateDialLevel(this.value)">
-              <div class="flex justify-between text-xs text-slate-400 mt-1">
-                <span>1.0x</span>
-                <span id="dialLevelLabel" class="font-bold text-indigo-400">2.5x</span>
-                <span>5.0x</span>
-              </div>
-            </div>
-
-            <div>
-              <label class="text-xs font-semibold text-slate-400 block mb-1">Max Drop Percentage Target</label>
-              <select class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                <option value="1.5">1.5% (Strict SLA)</option>
-                <option value="3.0" selected>3.0% (Standard Call Center)</option>
-                <option value="5.0">5.0% (Aggressive Outbound)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Workstation Checklist -->
-        <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 space-y-4">
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <i data-lucide="check-square" class="w-5 h-5 text-emerald-400"></i> Setup Checklist
-          </h3>
-
-          <ul class="space-y-2.5 text-xs">
-            <li class="flex items-center gap-2 text-slate-300">
-              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> Multi-monitor Video Wall Mounts
-            </li>
-            <li class="flex items-center gap-2 text-slate-300">
-              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> VICI Dialer Real-time Display Feed
-            </li>
-            <li class="flex items-center gap-2 text-slate-300">
-              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> Agent Desk Workstation Layout
-            </li>
-            <li class="flex items-center gap-2 text-slate-400">
-              <i data-lucide="circle" class="w-4 h-4 text-slate-600"></i> Dedicated Fiber Gateway Connection
-            </li>
-          </ul>
-        </div>
-
-      </div>
-
+    <!-- Supervisor Banner -->
+    <div id="themeBanner" class="bg-emerald-600 text-white font-extrabold text-2xl text-center py-2 rounded-lg mb-3 shadow">
+      <span id="bannerSupervisorName">Qaiser Khan</span>
     </div>
 
-  </main>
+    <!-- Performance Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse font-bold text-xs sm:text-sm">
+        <thead>
+          <tr class="bg-black text-gray-200 border-b-2 border-gray-700">
+            <th class="p-2.5">USER</th>
+            <th class="p-2.5 text-center">ID</th>
+            <th class="p-2.5 text-center">D1</th>
+            <th class="p-2.5 text-center">D5</th>
+            <th class="p-2.5 text-center">D8</th>
+            <th class="p-2.5 text-center">TOTAL CALLS</th>
+            <th class="p-2.5 text-center">TOTAL SALES</th>
+            <th class="p-2.5 text-center">CONV (%)</th>
+            <th class="p-2.5 text-center">LAST HOUR</th>
+          </tr>
+        </thead>
+        <tbody id="agentTableBody">
+          <!-- Rows inserted dynamically -->
+        </tbody>
+      </table>
+    </div>
 
-  <!-- Interactive JavaScript -->
+  </div>
+
   <script>
-    // Initialize Lucide Icons
-    lucide.createIcons();
+    // Sample Data Initialization
+    let agentsData = [
+      { user: "Michael Tolliver-HQ", id: "1001", team: "HQ", d1: 69, d5: 38, d8: 77, totalCalls: 450, totalSales: 184, conversion: "40.8%", lastHour: 18 },
+      { user: "Danny Parker 2.0", id: "2018", team: "2.0", d1: 79, d5: 23, d8: 75, totalCalls: 420, totalSales: 177, conversion: "42.1%", lastHour: 15 },
+      { user: "Dan Muccray-HQ", id: "1016", team: "HQ", d1: 59, d5: 46, d8: 64, totalCalls: 390, totalSales: 169, conversion: "43.3%", lastHour: 14 },
+      { user: "Jordan Ford-HQ", id: "1002", team: "HQ", d1: 58, d5: 22, d8: 65, totalCalls: 340, totalSales: 145, conversion: "42.6%", lastHour: 12 },
+      { user: "Bryan Grayson 2.0", id: "2004", team: "2.0", d1: 53, d5: 14, d8: 58, totalCalls: 310, totalSales: 125, conversion: "40.3%", lastHour: 10 },
+      { user: "Mike James-HQ", id: "1003", team: "HQ", d1: 32, d5: 14, d8: 71, totalCalls: 290, totalSales: 117, conversion: "40.3%", lastHour: 9 },
+      { user: "Steve Henley-HQ", id: "1024", team: "HQ", d1: 17, d5: 41, d8: 56, totalCalls: 280, totalSales: 114, conversion: "40.7%", lastHour: 8 },
+      { user: "David Gibson 2.0", id: "2014", team: "2.0", d1: 58, d5: 14, d8: 38, totalCalls: 270, totalSales: 110, conversion: "40.7%", lastHour: 7 },
+      { user: "Lewis Cooper 2.0", id: "2010", team: "2.0", d1: 39, d5: 8, d8: 59, totalCalls: 260, totalSales: 106, conversion: "40.7%", lastHour: 6 },
+      { user: "Bryan Wilson 2.0", id: "2032", team: "2.0", d1: 35, d5: 20, d8: 50, totalCalls: 250, totalSales: 105, conversion: "42.0%", lastHour: 5 },
+      { user: "Oscar Lawson 2.0", id: "2005", team: "2.0", d1: 34, d5: 12, d8: 58, totalCalls: 240, totalSales: 104, conversion: "43.3%", lastHour: 5 },
+      { user: "Logan Foster 2.0", id: "2034", team: "2.0", d1: 38, d5: 14, d8: 50, totalCalls: 230, totalSales: 102, conversion: "44.3%", lastHour: 4 },
+      { user: "Jason Morgan-HQ", id: "1010", team: "HQ", d1: 37, d5: 32, d8: 32, totalCalls: 220, totalSales: 101, conversion: "45.9%", lastHour: 4 },
+      { user: "Jason Brown-HQ", id: "1004", team: "HQ", d1: 23, d5: 18, d8: 55, totalCalls: 210, totalSales: 96, conversion: "45.7%", lastHour: 3 },
+      { user: "Nick Clover 2.0", id: "1030", team: "2.0", d1: 45, d5: 10, d8: 40, totalCalls: 200, totalSales: 95, conversion: "47.5%", lastHour: 2 }
+    ];
 
-    // Dial Level Slider update
-    function updateDialLevel(val) {
-      document.getElementById('dialLevelLabel').innerText = val + 'x';
+    let currentThemeColor = "#16a34a"; // Classic Green Default
+    let selectedTeam = "ALL";
+
+    // Dynamic Supervisor Name Update
+    document.getElementById('supervisorName').addEventListener('input', function(e) {
+      document.getElementById('bannerSupervisorName').innerText = e.target.value || "Supervisor";
+    });
+
+    // Render Table according to Top, Mid, Low performers tiering
+    function renderTable() {
+      const tbody = document.getElementById('agentTableBody');
+      tbody.innerHTML = '';
+
+      let filtered = agentsData;
+      if (selectedTeam !== "ALL") {
+        filtered = agentsData.filter(a => a.team.toUpperCase().includes(selectedTeam.toUpperCase()) || a.user.toUpperCase().includes(selectedTeam.toUpperCase()));
+      }
+
+      // Sort by Sales High to Low
+      filtered.sort((a, b) => (b.totalSales || 0) - (a.totalSales || 0));
+
+      document.getElementById('agentCountBadge').innerText = `${filtered.length} AGENTS DETECTED`;
+
+      const totalCount = filtered.length;
+
+      filtered.forEach((agent, index) => {
+        const tr = document.createElement('tr');
+        
+        // Tiering logic: Top 30% Top, Mid 40% Mid, Bottom 30% Low
+        let rowBg = currentThemeColor; 
+        let opacity = 1;
+
+        if (index < Math.ceil(totalCount * 0.3)) {
+          // Top performers (Full Brightness)
+          opacity = 1;
+        } else if (index < Math.ceil(totalCount * 0.7)) {
+          // Mid performers (Medium opacity)
+          opacity = 0.8;
+        } else {
+          // Low performers (Lower opacity/darker background)
+          opacity = 0.6;
+        }
+
+        tr.style.backgroundColor = rowBg;
+        tr.style.opacity = opacity;
+        tr.className = "border-b border-black text-white hover:brightness-110 transition";
+
+        tr.innerHTML = `
+          <td class="p-2.5 font-bold"><span class="editable-cell" contenteditable="true">${agent.user}</span></td>
+          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.id}</span></td>
+          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.d1}</span></td>
+          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.d5}</span></td>
+          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.d8}</span></td>
+          <td class="p-2.5 text-center font-bold"><span class="editable-cell" contenteditable="true">${agent.totalCalls}</span></td>
+          <td class="p-2.5 text-center font-bold"><span class="editable-cell" contenteditable="true">${agent.totalSales}</span></td>
+          <td class="p-2.5 text-center"><span class="editable-cell" contenteditable="true">${agent.conversion}</span></td>
+          <td class="p-2.5 text-center font-bold"><span class="editable-cell" contenteditable="true">${agent.lastHour}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    // Simulated Feed Refresh Function
-    function toggleSimulatedFeeds() {
-      const activeSpan = document.getElementById('agentsActive');
-      const waitingSpan = document.getElementById('callsWaiting');
-      const occupancySpan = document.getElementById('occupancyVal');
-
-      // Randomize stats slightly to show live interactive effect
-      activeSpan.innerText = Math.floor(Math.random() * 10) + 38;
-      waitingSpan.innerText = Math.floor(Math.random() * 5) + 1;
-      occupancySpan.innerText = (88 + Math.random() * 8).toFixed(1) + '%';
+    // Filter Team Function
+    function filterTeam(teamName) {
+      selectedTeam = teamName;
+      document.querySelectorAll('.team-btn').forEach(btn => {
+        if (btn.innerText.toUpperCase() === teamName.toUpperCase() || (teamName === 'ALL' && btn.innerText === 'All Teams')) {
+          btn.className = "team-btn bg-black text-white font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm";
+        } else {
+          btn.className = "team-btn bg-white text-black font-bold px-4 py-1.5 rounded-full border-2 border-black text-sm";
+        }
+      });
+      renderTable();
     }
+
+    // Theme Color Changes
+    function changeTheme(theme) {
+      const picker = document.getElementById('customColorPicker');
+      picker.classList.add('hidden');
+
+      switch(theme) {
+        case 'classic-green': currentThemeColor = "#16a34a"; break;
+        case 'ocean-blue': currentThemeColor = "#2563eb"; break;
+        case 'crimson-red': currentThemeColor = "#dc2626"; break;
+        case 'amber-gold': currentThemeColor = "#d97706"; break;
+        case 'purple-dark': currentThemeColor = "#7c3aed"; break;
+        case 'custom': 
+          picker.classList.remove('hidden');
+          currentThemeColor = picker.value;
+          break;
+      }
+      document.getElementById('themeBanner').style.backgroundColor = currentThemeColor;
+      renderTable();
+    }
+
+    function applyCustomColor(color) {
+      currentThemeColor = color;
+      document.getElementById('themeBanner').style.backgroundColor = currentThemeColor;
+      renderTable();
+    }
+
+    // CSV File Reader
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      document.getElementById('fileNameDisplay').innerText = file.name;
+      const reader = new FileReader();
+
+      reader.onload = function(evt) {
+        const text = evt.target.result;
+        const lines = text.split('\n');
+        let parsedData = [];
+
+        lines.forEach((line, idx) => {
+          if (idx === 0 || !line.trim()) return; // Skip header
+          const cols = line.split(',').map(c => c.trim().replace(/"/g, ''));
+          if (cols.length >= 3) {
+            parsedData.push({
+              user: cols[0] || 'Agent',
+              id: cols[1] || '1000',
+              team: cols[0].includes('HQ') ? 'HQ' : '2.0',
+              d1: parseInt(cols[2]) || 0,
+              d5: parseInt(cols[3]) || 0,
+              d8: parseInt(cols[4]) || 0,
+              totalCalls: parseInt(cols[5]) || (parseInt(cols[2]||0)*5 + 50),
+              totalSales: parseInt(cols[6]) || (parseInt(cols[2]||0) + parseInt(cols[3]||0)),
+              conversion: cols[7] || "35.0%",
+              lastHour: parseInt(cols[8]) || Math.floor(Math.random() * 15)
+            });
+          }
+        });
+
+        if (parsedData.length > 0) {
+          agentsData = parsedData;
+          renderTable();
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    // Screenshot Generator
+    function copyScreenshot() {
+      const target = document.getElementById('reportContainer');
+      html2canvas(target).then(canvas => {
+        canvas.toBlob(blob => {
+          navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]).then(() => {
+            alert('Screenshot copied to Clipboard successfully!');
+          });
+        });
+      });
+    }
+
+    function resetData() {
+      selectedTeam = "ALL";
+      renderTable();
+    }
+
+    // Initial Render
+    renderTable();
   </script>
 </body>
 </html>
