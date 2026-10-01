@@ -29,7 +29,7 @@
     <h3>🔗 Connect New Vicidialer Link</h3>
     <div class="form-group">
       <input type="text" id="dialerName" placeholder="Dialer Name (e.g. USA Outbound)" required>
-      <input type="url" id="dialerUrl" placeholder="Vicidial URL (e.g. https://vici.com/vicidial/non_agent_api.php)" style="width: 350px;" required>
+      <input type="url" id="dialerUrl" placeholder="https://sbaca3.maxtelco.com/vicidial/non_agent_api.php" style="width: 400px;" required>
       <input type="text" id="apiUser" placeholder="API User" required>
       <input type="password" id="apiPass" placeholder="API Password" required>
       <button onclick="addDialer()">Connect Dialer</button>
@@ -71,7 +71,7 @@
 
     function addDialer() {
       const name = document.getElementById('dialerName').value;
-      const url = document.getElementById('dialerUrl').value;
+      let url = document.getElementById('dialerUrl').value;
       const user = document.getElementById('apiUser').value;
       const pass = document.getElementById('apiPass').value;
 
@@ -80,10 +80,18 @@
         return;
       }
 
-      dialers.push({ name, url, user, pass, lastHourSales: 0, totalCalls: 0, totalDeals: 0 });
+      // Auto correct URL if user pasted HTML page link
+      if (!url.includes('non_agent_api.php')) {
+        url = url.substring(0, url.lastIndexOf('/')) + '/non_agent_api.php';
+      }
+
+      dialers.push({ 
+        name, url, user, pass, 
+        totalCalls: 0, d1: 0, d5: 0, d8: 0, d9: 0, sale: 0, totalDeals: 0, lastHourSales: 0 
+      });
       saveDialers();
       fetchLiveMetrics();
-      alert("Dialer Link Save Ho Gaya!");
+      alert("Dialer Link Saved Successfully!");
     }
 
     function renderSummary() {
@@ -99,21 +107,51 @@
           <tr>
             <td><b>${d.name}</b></td>
             <td>${d.totalCalls}</td>
-            <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+            <td>${d.d1 || 0}</td>
+            <td>${d.d5 || 0}</td>
+            <td>${d.d8 || 0}</td>
+            <td>${d.d9 || 0}</td>
+            <td>${d.sale || 0}</td>
             <td><b>${d.totalDeals}</b></td>
             <td>${conv}%</td>
-            <td class="hot">${d.lastHourSales} Deals</td>
+            <td class="hot">${d.lastHourSales || 0} Deals</td>
             <td>🟢 Live (Auto-Refresh)</td>
           </tr>
         `;
       }).join('');
     }
 
-    function fetchLiveMetrics() {
-      dialers.forEach(d => {
-        const requestUrl = `${d.url}?source=reporter&user=${d.user}&pass=${d.pass}&function=agent_stats_export`;
-        console.log("Fetching live data from:", requestUrl);
-      });
+    async function fetchLiveMetrics() {
+      for (let d of dialers) {
+        const apiUrl = `${d.url}?source=reporter&user=${d.user}&pass=${d.pass}&function=agent_stats_export&stage=csv`;
+        
+        try {
+          // Fetch API response
+          const response = await fetch(apiUrl);
+          const data = await response.text();
+          
+          if (data && !data.includes("ERROR")) {
+            // Process API response string
+            const lines = data.trim().split("\n");
+            let calls = 0, deals = 0;
+
+            lines.forEach((line, index) => {
+              if (index > 0) {
+                const cols = line.split(",");
+                if (cols.length > 3) {
+                  calls += parseInt(cols[2] || 0);
+                  deals += parseInt(cols[cols.length - 1] || 0);
+                }
+              }
+            });
+
+            d.totalCalls = calls;
+            d.totalDeals = deals;
+          }
+        } catch (err) {
+          console.log("CORS / Network attempt for:", d.name);
+        }
+      }
       renderSummary();
     }
 
