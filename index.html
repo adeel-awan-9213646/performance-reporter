@@ -97,7 +97,7 @@
             opacity: 0.85;
         }
 
-        /* Dotted Upload Box */
+        /* Upload Box */
         .upload-box {
             border: 2px dashed #000000;
             border-radius: 10px;
@@ -117,7 +117,7 @@
             display: none;
         }
 
-        /* Teams Container */
+        /* Teams Filter Container */
         .teams-container {
             border: 2px solid #000000;
             border-radius: 16px;
@@ -145,7 +145,7 @@
             color: white;
         }
 
-        /* Card Container */
+        /* Main Card Area */
         .card-container {
             background-color: #ffffff;
             border: 2px solid #000000;
@@ -190,7 +190,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Excel Exact Matching Table Design */
+        /* True Excel Sheet Grid Styling */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -202,11 +202,12 @@
             font-size: 14px;
             min-width: 800px;
             background-color: #ffffff;
+            border: 2px solid #7f8c8d;
         }
 
-        /* Header Styling */
+        /* Excel Header */
         .excel-table th {
-            background-color: #a8b3c1;
+            background-color: #b0bec5;
             color: #000000;
             font-weight: 900;
             text-align: center;
@@ -222,9 +223,9 @@
             min-width: 220px;
         }
 
-        /* Summary Row (Top Totals Row) */
+        /* Excel Summary Row (Top Totals Row) */
         .summary-row td {
-            background-color: #d1d8e0;
+            background-color: #cfd8dc;
             color: #000000;
             font-weight: 900;
             font-size: 15px;
@@ -239,9 +240,9 @@
             font-size: 16px;
         }
 
-        /* Data Body Rows */
+        /* Excel Data Body Rows */
         .excel-table tbody tr {
-            border-bottom: 1px solid #d1d8e0;
+            border-bottom: 1px solid #b0bec5;
         }
 
         .excel-table tbody tr:nth-child(even) {
@@ -253,11 +254,11 @@
         }
 
         .excel-table td {
-            padding: 8px;
+            padding: 8px 10px;
             text-align: center;
             font-weight: 800;
             color: #000000;
-            border: 1px solid #d1d8e0;
+            border: 1px solid #cfd8dc;
             outline: none;
         }
 
@@ -272,9 +273,9 @@
             font-weight: 800;
         }
 
-        /* Last Column Red Cell Highlight */
+        /* Red Total Column Highlight */
         .excel-table td.total-col-cell {
-            background-color: #d93838 !important; /* Red for Total Column */
+            background-color: #d93838 !important; /* Red highlight for totals */
             color: #ffffff !important;
             font-weight: 900;
             font-size: 15px;
@@ -292,7 +293,7 @@
     <div class="control-row-1">
         <input type="text" id="managerInput" class="input-box" value="Qaiser Khan" placeholder="Manager Name">
         <select id="themeSelect" class="select-box">
-            <option value="default">📊 Excel Standard Theme</option>
+            <option value="default">📊 Excel Grid Sheet Theme</option>
         </select>
     </div>
 
@@ -322,7 +323,7 @@
     <div class="card-container" id="captureCard">
         <div class="card-header-top">
             <span class="filename-text" id="filenameDisplay">AGENT_PERFORMACE_DETAIL20261001-104413.csv</span>
-            <span class="badge-agents" id="agentCountBadge">26 AGENTS DETECTED</span>
+            <span class="badge-agents" id="agentCountBadge">5 AGENTS DETECTED</span>
         </div>
 
         <div class="manager-title-banner" id="cardManagerTitle">
@@ -335,17 +336,16 @@
                     <tr id="tableHeaderRow">
                         <th>USER NAME</th>
                         <th>ID</th>
+                        <th>TOTAL CALLS</th>
                         <th>D1</th>
                         <th>D5</th>
-                        <th>D6</th>
                         <th>D8</th>
-                        <th>D8INT</th>
-                        <th>D9</th>
-                        <th>TOTAL</th>
+                        <th>TOTAL SALES</th>
+                        <th>CONV %</th>
                     </tr>
                 </thead>
                 <tbody id="agentTableBody">
-                    <!-- Dynamic Rows Generated via JavaScript -->
+                    <!-- Dynamic Grid Rows Generated via JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -353,35 +353,12 @@
 </div>
 
 <script>
-    // Initial Sample Data structured exactly like image
     let rawAgentsData = [
-        { name: "Michael Tolliver-HQ", id: "1001", d1: 69, d5: 38, d6: 0, d8: 77, d8int: 1, d9: 0, total: 185 },
-        { name: "Danny Parker 2.0", id: "2018", d1: 79, d5: 23, d6: 0, d8: 75, d8int: 0, d9: 0, total: 177 },
-        { name: "Dan Muccray-HQ", id: "1016", d1: 59, d5: 46, d6: 0, d8: 64, d8int: 0, d9: 0, total: 169 },
-        { name: "Jordan Ford-HQ", id: "1002", d1: 58, d5: 22, d6: 0, d8: 65, d8int: 0, d9: 0, total: 145 },
-        { name: "Bryan Grayson 2.0", id: "2004", d1: 53, d5: 14, d6: 0, d8: 58, d8int: 0, d9: 0, total: 125 },
-        { name: "Mike James-HQ", id: "1003", d1: 32, d5: 14, d6: 0, d8: 71, d8int: 0, d9: 0, total: 117 },
-        { name: "Steve Henley-HQ", id: "1024", d1: 17, d5: 41, d6: 0, d8: 56, d8int: 0, d9: 0, total: 114 },
-        { name: "David Gibson 2.0", id: "2014", d1: 58, d5: 14, d6: 0, d8: 38, d8int: 0, d9: 0, total: 110 },
-        { name: "Lewis Cooper 2.0", id: "2010", d1: 39, d5: 8, d6: 0, d8: 59, d8int: 0, d9: 0, total: 106 },
-        { name: "Bryan Wilson 2.0", id: "2032", d1: 35, d5: 20, d6: 0, d8: 50, d8int: 0, d9: 0, total: 105 },
-        { name: "Oscar Lawson 2.0", id: "2005", d1: 34, d5: 12, d6: 0, d8: 58, d8int: 0, d9: 0, total: 104 },
-        { name: "Logan Foster 2.0", id: "2034", d1: 38, d5: 14, d6: 0, d8: 50, d8int: 0, d9: 0, total: 102 },
-        { name: "Jason Morgan - Danish...", id: "1010", d1: 37, d5: 32, d6: 0, d8: 32, d8int: 0, d9: 0, total: 101 },
-        { name: "Jason Brown-HQ", id: "1004", d1: 23, d5: 18, d6: 0, d8: 55, d8int: 0, d9: 0, total: 96 },
-        { name: "Nick Clover 2.0", id: "1030", d1: 45, d5: 10, d6: 0, d8: 40, d8int: 1, d9: 0, total: 96 },
-        { name: "Erica Adams-HQ", id: "1011", d1: 20, d5: 10, d6: 0, d8: 54, d8int: 0, d9: 0, total: 84 },
-        { name: "Zack Murphy 2.0", id: "2015", d1: 26, d5: 4, d6: 0, d8: 53, d8int: 0, d9: 0, total: 83 },
-        { name: "Brad Miller 2.0 Aliyan", id: "2008", d1: 41, d5: 8, d6: 0, d8: 33, d8int: 0, d9: 0, total: 82 },
-        { name: "Nick Clover - HQ", id: "1019", d1: 21, d5: 6, d6: 0, d8: 53, d8int: 0, d9: 0, total: 80 },
-        { name: "Terry Brown -HQ", id: "1017", d1: 22, d5: 3, d6: 0, d8: 54, d8int: 0, d9: 0, total: 79 },
-        { name: "Jay Robbins 2.0", id: "2031", d1: 12, d5: 14, d6: 0, d8: 50, d8int: 2, d9: 0, total: 78 },
-        { name: "Jacob Brown - HQ", id: "1027", d1: 15, d5: 15, d6: 0, d8: 44, d8int: 1, d9: 0, total: 75 },
-        { name: "Jasper hale 2.0", id: "2006", d1: 31, d5: 2, d6: 0, d8: 42, d8int: 0, d9: 0, total: 75 },
-        { name: "Adam Brown -HQ", id: "1025", d1: 19, d5: 9, d6: 0, d8: 46, d8int: 0, d9: 0, total: 74 },
-        { name: "Henry 2.1", id: "2020", d1: 27, d5: 7, d6: 0, d8: 39, d8int: 0, d9: 1, total: 74 },
-        { name: "Lisa Smith 2.0", id: "2029", d1: 16, d5: 9, d6: 0, d8: 48, d8int: 0, d9: 0, total: 73 },
-        { name: "Alex -HQ", id: "1021", d1: 17, d5: 14, d6: 0, d8: 40, d8int: 0, d9: 0, total: 71 }
+        { name: "Michael Tolliver-HQ", id: "1001", totalCalls: 184, d1: 69, d5: 38, d8: 77, d9: 0, sales: 82, conv: "44.5%" },
+        { name: "Danny Parker 2.0", id: "2018", totalCalls: 177, d1: 79, d5: 23, d8: 75, d9: 0, sales: 79, conv: "44.6%" },
+        { name: "Dan Muccray-HQ", id: "1016", totalCalls: 169, d1: 59, d5: 46, d8: 64, d9: 0, sales: 71, conv: "42.0%" },
+        { name: "Jordan Ford-HQ", id: "1002", totalCalls: 145, d1: 58, d5: 22, d8: 65, d9: 0, sales: 64, conv: "44.1%" },
+        { name: "Bryan Grayson 2.1", id: "2004", totalCalls: 125, d1: 53, d5: 14, d8: 58, d9: 0, sales: 55, conv: "44.0%" }
     ];
 
     let currentSelectedTeam = "All Teams";
@@ -401,58 +378,63 @@
         });
 
         // Sort Highest to Lowest
-        filtered.sort((a, b) => b.total - a.total);
+        filtered.sort((a, b) => (b.sales || b.totalCalls) - (a.sales || a.totalCalls));
 
-        // Dispositions Keys List
-        let dispKeys = ["d1", "d5", "d6", "d8", "d8int", "d9"];
+        // Find Dynamic Dispositions (D1 to D9)
+        let activeDispositions = [];
+        for (let i = 1; i <= 9; i++) {
+            let key = 'd' + i;
+            let hasValue = filtered.some(a => a[key] && Number(a[key]) > 0);
+            if (hasValue) {
+                activeDispositions.push(i);
+            }
+        }
 
         // Calculate Totals for Top Summary Row
-        let totals = { d1: 0, d5: 0, d6: 0, d8: 0, d8int: 0, d9: 0, grandTotal: 0 };
+        let totalCallsSum = 0;
+        let totalSalesSum = 0;
+        let dispTotals = {};
+        activeDispositions.forEach(d => dispTotals['d' + d] = 0);
+
         filtered.forEach(agent => {
-            dispKeys.forEach(k => {
-                totals[k] += (Number(agent[k]) || 0);
+            totalCallsSum += (Number(agent.totalCalls) || 0);
+            totalSalesSum += (Number(agent.sales) || 0);
+            activeDispositions.forEach(d => {
+                dispTotals['d' + d] += (Number(agent['d' + d]) || 0);
             });
-            totals.grandTotal += (Number(agent.total) || 0);
         });
 
-        // 1. Render Table Header
-        let headerHTML = `
-            <th>USER NAME</th>
-            <th>ID</th>
-            <th>D1</th>
-            <th>D5</th>
-            <th>D6</th>
-            <th>D8</th>
-            <th>D8INT</th>
-            <th>D9</th>
-            <th>TOTAL</th>
-        `;
+        // 1. Render Excel Table Header
+        let headerHTML = `<th>USER NAME</th><th>ID</th><th>TOTAL CALLS</th>`;
+        activeDispositions.forEach(dNum => {
+            headerHTML += `<th>D${dNum}</th>`;
+        });
+        headerHTML += `<th>TOTAL SALES</th><th>CONV %</th>`;
         document.getElementById('tableHeaderRow').innerHTML = headerHTML;
 
-        // 2. Render Table Body
+        // 2. Render Excel Table Body
         let tbody = document.getElementById('agentTableBody');
         tbody.innerHTML = '';
 
-        // Add Top Summary Row
+        // Add Top Excel Summary Row
         let summaryRow = document.createElement('tr');
         summaryRow.className = 'summary-row';
-        summaryRow.innerHTML = `
+        let summaryHTML = `
             <td></td>
             <td></td>
-            <td contenteditable="true">${totals.d1}</td>
-            <td contenteditable="true">${totals.d5}</td>
-            <td contenteditable="true">${totals.d6}</td>
-            <td contenteditable="true">${totals.d8}</td>
-            <td contenteditable="true">${totals.d8int}</td>
-            <td contenteditable="true">${totals.d9}</td>
-            <td contenteditable="true" class="total-grand-cell">${totals.grandTotal}</td>
+            <td contenteditable="true">${totalCallsSum}</td>
         `;
+        activeDispositions.forEach(dNum => {
+            summaryHTML += `<td contenteditable="true">${dispTotals['d' + dNum]}</td>`;
+        });
+        summaryHTML += `<td contenteditable="true" class="total-grand-cell">${totalSalesSum}</td><td></td>`;
+        summaryRow.innerHTML = summaryHTML;
         tbody.appendChild(summaryRow);
 
         // Add Agent Rows
         if (filtered.length === 0) {
             let emptyTr = document.createElement('tr');
-            emptyTr.innerHTML = `<td colspan="9" style="text-align:center; padding: 20px;">No agents found for ${currentSelectedTeam}</td>`;
+            emptyTr.innerHTML = `<td colspan="12" style="text-align:center; padding: 20px;">No agents found for team ${currentSelectedTeam}</td>`;
             tbody.appendChild(emptyTr);
             document.getElementById('agentCountBadge').innerText = `0 AGENTS DETECTED`;
             return;
@@ -460,17 +442,23 @@
 
         filtered.forEach(agent => {
             let tr = document.createElement('tr');
-            tr.innerHTML = `
+            let rowContent = `
                 <td contenteditable="true">${agent.name}</td>
                 <td contenteditable="true">${agent.id}</td>
-                <td contenteditable="true">${agent.d1 || 0}</td>
-                <td contenteditable="true">${agent.d5 || 0}</td>
-                <td contenteditable="true">${agent.d6 || 0}</td>
-                <td contenteditable="true">${agent.d8 || 0}</td>
-                <td contenteditable="true">${agent.d8int || 0}</td>
-                <td contenteditable="true">${agent.d9 || 0}</td>
-                <td contenteditable="true" class="total-col-cell">${agent.total || 0}</td>
+                <td contenteditable="true">${agent.totalCalls}</td>
             `;
+
+            activeDispositions.forEach(dNum => {
+                let key = 'd' + dNum;
+                rowContent += `<td contenteditable="true">${agent[key] || 0}</td>`;
+            });
+
+            rowContent += `
+                <td contenteditable="true" class="total-col-cell">${agent.sales}</td>
+                <td contenteditable="true">${agent.conv}</td>
+            `;
+
+            tr.innerHTML = rowContent;
             tbody.appendChild(tr);
         });
 
@@ -533,24 +521,16 @@
         for (let i = 1; i < lines.length; i++) {
             const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
             if (cols.length >= 8) {
-                let d1Val = parseInt(cols[2]) || 0;
-                let d5Val = parseInt(cols[3]) || 0;
-                let d6Val = parseInt(cols[4]) || 0;
-                let d8Val = parseInt(cols[5]) || 0;
-                let d8intVal = parseInt(cols[6]) || 0;
-                let d9Val = parseInt(cols[7]) || 0;
-                let totVal = d1Val + d5Val + d6Val + d8Val + d8intVal + d9Val;
-
                 rawAgentsData.push({
                     name: cols[0] || 'Agent',
                     id: cols[1] || '-',
-                    d1: d1Val,
-                    d5: d5Val,
-                    d6: d6Val,
-                    d8: d8Val,
-                    d8int: d8intVal,
-                    d9: d9Val,
-                    total: totVal
+                    totalCalls: parseInt(cols[5]) || parseInt(cols[2]) || 0,
+                    d1: parseInt(cols[2]) || 0,
+                    d5: parseInt(cols[3]) || 0,
+                    d8: parseInt(cols[4]) || 0,
+                    d9: parseInt(cols[9]) || 0,
+                    sales: parseInt(cols[6]) || 0,
+                    conv: cols[7] || '0%'
                 });
             }
         }
