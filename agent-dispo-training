@@ -1,1 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartBrains BPO - VICIdial Agent Disposition Training Portal</title>
+    <style>
+        :root {
+            --primary-blue: #0d47a1;
+            --accent-blue: #1976d2;
+            --bg-color: #f4f7fc;
+            --card-bg: #ffffff;
+            --border-color: #dcdcdc;
+            --vici-green: #99FF99;
+            --vici-green-hover: #7bef7b;
+            --vici-text: #0000FF;
+            --success-color: #2e7d32;
+            --danger-color: #c62828;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #333;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0a2540 0%, #0d47a1 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 30px;
+            font-weight: 900;
+        }
+
+        .header p {
+            color: #90caf9;
+            font-size: 14px;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            background: #e3f2fd;
+            padding: 8px;
+            border-radius: 14px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            background: transparent;
+            color: var(--primary-blue);
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 10px rgba(13, 71, 161, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e3f2fd;
+            padding-bottom: 8px;
+        }
+
+        /* Practice Interactive Simulator */
+        .scenario-box {
+            background: #eef5fc;
+            border-left: 6px solid var(--primary-blue);
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* VICIdial Matching Green Panel Grid */
+        .vici-panel {
+            background-color: var(--vici-green);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #7cdc7c;
+            margin-bottom: 20px;
+        }
+
+        .vici-title {
+            font-weight: 900;
+            font-size: 18px;
+            color: #000;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dispo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 12px;
+        }
+
+        .dispo-btn {
+            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            color: var(--vici-text);
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: left;
+            text-decoration: underline;
+            transition: all 0.2s;
+        }
+
+        .dispo-btn:hover {
+            background: var(--vici-green-hover);
+            color: #000080;
+        }
+
+        .feedback-box {
+            display: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+
+        .feedback-correct {
+            background: #e8f5e9;
+            color: var(--success-color);
+            border: 2px solid #a5d6a7;
+        }
+
+        .feedback-wrong {
+            background: #ffebee;
+            color: var(--danger-color);
+            border: 2px solid #ef9a9a;
+        }
+
+        .btn-next {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            float: right;
+            margin-top: 15px;
+        }
+
+        /* Dictionary Table */
+        .dict-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .dict-table th, .dict-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .dict-table th {
+            background: var(--primary-blue);
+            color: white;
+            font-weight: 800;
+        }
+
+        .code-badge {
+            background: #e1f5fe;
+            color: #0288d1;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>SmartBrains BPO</h1>
+        <p>VICIdial Call Disposition Agent Training & Simulator Portal</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('simTab', this)">🎮 Interactive Call Simulator</button>
+        <button class="tab-btn" onclick="switchTab('dictTab', this)">📚 Disposition Guide & Dictionary</button>
+    </div>
+
+    <!-- TAB 1: INTERACTIVE SIMULATOR -->
+    <div id="simTab" class="tab-content active">
+        <div class="card">
+            <div class="card-title">📞 Call Scenario Practice (Select Correct Disposition)</div>
+            
+            <div class="scenario-box" id="scenarioText">
+                Loading Scenario...
+            </div>
+
+            <div class="vici-panel">
+                <div class="vici-title">CALL DISPOSITION</div>
+                <div class="dispo-grid" id="dispoOptions">
+                    <!-- Buttons rendered dynamically -->
+                </div>
+            </div>
+
+            <div id="feedbackBox" class="feedback-box"></div>
+
+            <button class="btn-next" id="btnNextScenario" style="display:none;" onclick="loadRandomScenario()">Next Scenario ➔</button>
+        </div>
+    </div>
+
+    <!-- TAB 2: DISPOSITION DICTIONARY -->
+    <div id="dictTab" class="tab-content">
+        <div class="card">
+            <div class="card-title">📖 Complete Disposition Rules & Guidelines</div>
+            
+            <input type="text" class="search-box" id="searchDict" placeholder="Search Disposition Code or Description..." onkeyup="filterDictionary()">
+
+            <div style="overflow-x: auto;">
+                <table class="dict-table" id="dictTable">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Disposition Name</th>
+                            <th>When to Use (Rules & Scenario Guidelines)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dictTableBody">
+                        <!-- Table rendered dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        SmartBrains BPO Internal Training System | Developed by Adeel Awan
+    </div>
+</div>
+
+<script>
+    const dispositionMaster = [
+        { code: "A", name: "Answering Machine", desc: "Select when the call goes directly to Voicemail, Answering Machine, or an Automated Answering System." },
+        { code: "B", name: "Busy", desc: "Select when the customer's phone line gives a busy tone or engaged signal." },
+        { code: "CALLBK", name: "Call Back", desc: "Select when the customer requests to be called back at a specific date and time." },
+        { code: "D8INT", name: "D8 Internet", desc: "Select when the call drops or disconnects due to internet connectivity issues." },
+        { code: "DAIR", name: "Dead Air", desc: "Select when the call connects but there is complete silence with no sound from either side." },
+        { code: "DC", name: "Disconnected Number", desc: "Select when you hear an automated announcement stating the number is disconnected or out of service." },
+        { code: "DEC", name: "Declined Sale", desc: "Select when the pitch and pricing details have been fully presented, but the customer declines the offer." },
+        { code: "DNC", name: "Do Not Call", desc: "Select when the customer strictly demands to be removed from the calling list permanently." },
+        { code: "N", name: "No Answer", desc: "Select when the phone rings continuously until it times out without anyone picking up." },
+        { code: "NI", name: "Not Interested", desc: "Select when the customer immediately refuses or states they are not interested before listening to the pitch." },
+        { code: "NP", name: "No Pitch No Price", desc: "Select when the call disconnects before the agent has the opportunity to deliver the pitch or state pricing." },
+        { code: "SALE", name: "Sale Made", desc: "Select when a successful sale is completed and all required details are fully verified." },
+        { code: "XFER", name: "Call Transferred", desc: "Select when the live call is successfully transferred to a Verifier or Senior Supervisor." },
+        { code: "DNQ", name: "Do Not Qualified", desc: "Select when the customer fails to meet essential campaign criteria (e.g., income, coverage area)." },
+        { code: "DSBL", name: "Disabled / Handicapped", desc: "Select when the customer is unable to proceed due to a physical or mental disability." },
+        { code: "Enroll", name: "Enroll", desc: "Select when the enrollment process is fully completed." },
+        { code: "FDNC", name: "Federal DNC", desc: "Select when the customer specifically mentions being registered on the National Federal DNC registry." },
+        { code: "HUAP", name: "Hangup After Pitch", desc: "Select when the agent completes the entire pitch, but the customer hangs up without responding." },
+        { code: "HUBP", name: "Hangup Before Pitch", desc: "Select when the customer hangs up the phone immediately as the agent begins the introductory pitch." },
+        { code: "LBR", name: "Language Barrier", desc: "Select when the customer does not speak or understand English (e.g., speaks Spanish or another language)." },
+        { code: "Med", name: "Medicare / Medicaid", desc: "Select when handling Medicare/Medicaid campaign-specific responses or queries." },
+        { code: "MedCL", name: "MedCL", desc: "Select for Medical Claim or campaign-specific medical dispositions." },
+        { code: "NOPick", name: "No Pickup", desc: "Select when the dialer system fails to establish a pickup connection." },
+        { code: "OverAg", name: "Over Age", desc: "Select when the customer exceeds the campaign's maximum age eligibility requirement." },
+        { code: "PREHU", name: "Pre Hangup", desc: "Select when the call disconnects instantly upon connection before any greeting." }
+    ];
+
+    const trainingScenarios = [
+        {
+            scenario: "Call connected. You delivered your opening greeting, but heard a Voicemail prompt and a beep tone.",
+            correctCode: "A",
+            explanation: "When a call reaches a voicemail or automated answering system, disposition as 'A - Answering Machine'."
+        },
+        {
+            scenario: "You delivered the full pitch and explained pricing. The customer replied: 'I appreciate the offer, but I don't want to purchase this plan'.",
+            correctCode: "DEC",
+            explanation: "When a customer declines after receiving full pitch and pricing, disposition as 'DEC - Declined Sale'."
+        },
+        {
+            scenario: "The customer stated: 'I am currently driving. Please call me back today at 6:00 PM'.",
+            correctCode: "CALLBK",
+            explanation: "When a customer requests a specific callback time, disposition as 'CALLBK - Call Back' and set the timer."
+        },
+        {
+            scenario: "An upset customer shouts: 'Stop calling my phone! Take me off your calling list immediately!'",
+            correctCode: "DNC",
+            explanation: "When a customer explicitly demands removal from the calling list, disposition as 'DNC - DO NOT CALL'."
+        },
+        {
+            scenario: "The call connected, but the customer only speaks Spanish and cannot understand English.",
+            correctCode: "LBR",
+            explanation: "When there is a language communication barrier, disposition as 'LBR - Language Barrier'."
+        },
+        {
+            scenario: "You started your introductory pitch, but within 3 seconds the customer hung up the line.",
+            correctCode: "HUBP",
+            explanation: "When the customer disconnects before the pitch is delivered, disposition as 'HUBP - Hangup Before Pitch'."
+        },
+        {
+            scenario: "You delivered the entire product pitch, but before you could ask for confirmation, the customer hung up.",
+            correctCode: "HUAP",
+            explanation: "When the customer hangs up after hearing the complete pitch, disposition as 'HUAP - Hangup After Pitch'."
+        },
+        {
+            scenario: "You hear an automated operator recording: 'The number you have dialed is disconnected or no longer in service'.",
+            correctCode: "DC",
+            explanation: "For invalid or out-of-service numbers, disposition as 'DC - Disconnected Number'."
+        },
+        {
+            scenario: "The customer states their age is 82 years, but your campaign maximum age limit is 75 years.",
+            correctCode: "OverAg",
+            explanation: "When a customer exceeds the allowable campaign age criteria, disposition as 'OverAg - Over Age'."
+        },
+        {
+            scenario: "The call connected, but you experience complete silence with no sound coming from either side.",
+            correctCode: "DAIR",
+            explanation: "When there is total audio silence upon call connection, disposition as 'DAIR - Dead Air'."
+        }
+    ];
+
+    let currentScenario = null;
+
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(tb => tb.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function renderDispoButtons() {
+        const grid = document.getElementById('dispoOptions');
+        grid.innerHTML = '';
+        dispositionMaster.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'dispo-btn';
+            btn.innerText = `${item.code} - ${item.name}`;
+            btn.onclick = () => checkAnswer(item.code);
+            grid.appendChild(btn);
+        });
+    }
+
+    function loadRandomScenario() {
+        document.getElementById('feedbackBox').style.display = 'none';
+        document.getElementById('btnNextScenario').style.display = 'none';
+
+        const randomIndex = Math.floor(Math.random() * trainingScenarios.length);
+        currentScenario = trainingScenarios[randomIndex];
+
+        document.getElementById('scenarioText').innerText = `📋 Scenario: "${currentScenario.scenario}"`;
+    }
+
+    function checkAnswer(selectedCode) {
+        const feedback = document.getElementById('feedbackBox');
+        feedback.style.display = 'block';
+
+        if (selectedCode === currentScenario.correctCode) {
+            feedback.className = 'feedback-box feedback-correct';
+            feedback.innerHTML = `✅ Correct! Selected Disposition: <strong>${currentScenario.correctCode}</strong><br><small>${currentScenario.explanation}</small>`;
+        } else {
+            feedback.className = 'feedback-box feedback-wrong';
+            feedback.innerHTML = `❌ Incorrect Selection! You selected <strong>${selectedCode}</strong>.<br>👉 Correct Code: <strong>${currentScenario.correctCode}</strong><br><small>${currentScenario.explanation}</small>`;
+        }
+
+        document.getElementById('btnNextScenario').style.display = 'block';
+    }
+
+    function renderDictionary() {
+        const tbody = document.getElementById('dictTableBody');
+        tbody.innerHTML = '';
+        dispositionMaster.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="code-badge">${item.code}</span></td>
+                <td><strong>${item.name}</strong></td>
+                <td>${item.desc}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function filterDictionary() {
+        const query = document.getElementById('searchDict').value.toLowerCase();
+        const rows = document.querySelectorAll('#dictTableBody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    }
+
+    window.onload = function() {
+        renderDispoButtons();
+        loadRandomScenario();
+        renderDictionary();
+    };
+</script>
+
+</body>
+</html>
